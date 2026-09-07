@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Montserrat } from "next/font/google";
 import "./globals.css";
 
@@ -12,11 +12,14 @@ const montserrat = Montserrat({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#8c688e",
+};
+
 export const metadata: Metadata = {
   title: "Elevate HER Workday",
   description: "A practical plan for the days work feels harder.",
   manifest: "/manifest.json",
-  themeColor: "#8c688e",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
