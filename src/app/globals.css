@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #8c688e;
+  --foreground: #ffffff;
+  
+  --primary: #4a154b;
+  --secondary: #8c688e;
+  --accent-1: #e8dde5;
+  --accent-2: #946587;
+  
+  --eh-plum: #4a154b;
+  --eh-lilac: #e8dde5;
+  --eh-mauve: #8c688e;
+  --eh-rose: #946587;
+  --eh-ink: #261f29;
+  --eh-muted: #605561;
+  --eh-paper: #ffffff;
+  --eh-canvas: #faf7fa;
+  --eh-line: #ded5df;
+  --eh-space-1: 4px;
+  --eh-space-2: 8px;
+  --eh-space-3: 12px;
+  --eh-space-4: 16px;
+  --eh-space-6: 24px;
+  --eh-space-8: 32px;
+  --eh-card-radius: 18px;
+  --eh-control-radius: 10px;
+  --eh-shadow: 0 6px 24px rgb(74 21 75 / 6%);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent-1: var(--accent-1);
+  --color-accent-2: var(--accent-2);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --font-sans: var(--font-montserrat);
+  --font-serif: var(--font-playfair);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply font-sans antialiased;
 }
