@@ -18,9 +18,7 @@ export async function POST(req: Request) {
 
       // When Phase C is active, you will query Supabase via the Service Role Key
       // to set the account's subscription_status to 'active' where email matches.
-      
-      console.log(Phase C Webhook Triggered: Payment received for );
-      // await supabaseAdmin.from('accounts').update({ subscription_status: 'active' }).eq('email', customerEmail);
+      console.log(`Phase C Webhook Triggered: Payment received for ${customerEmail}`);
     }
 
     return NextResponse.json({ received: true });
