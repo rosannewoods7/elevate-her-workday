@@ -12,7 +12,9 @@ describe('Routing Rules', () => {
       effortBudget: 'tiny',
       keptTools: [],
       excludedActions: [],
-      helpfulActions: []
+      helpfulActions: [],
+      pinnedActions: [],
+      recentFamilies: []
     };
     
     const actions = selectActions('focus', null, ctx);
@@ -39,7 +41,9 @@ describe('Routing Rules', () => {
       effortBudget: 'tiny',
       keptTools: [],
       excludedActions: [],
-      helpfulActions: []
+      helpfulActions: [],
+      pinnedActions: [],
+      recentFamilies: []
     };
     const actions = selectActions(focus.primary, focus.secondary, ctx);
     expect(actions[0].id).toBe('S01');
@@ -62,7 +66,9 @@ describe('Routing Rules', () => {
       effortBudget: null,
       keptTools: [],
       excludedActions: [],
-      helpfulActions: []
+      helpfulActions: [],
+      pinnedActions: [],
+      recentFamilies: []
     };
     const actions = selectActions(focus.primary, focus.secondary, ctx);
     expect(actions[0].id).toBe('G01');
@@ -89,7 +95,9 @@ describe('Routing Rules', () => {
       effortBudget: 'brief',
       keptTools: [],
       excludedActions: [],
-      helpfulActions: []
+      helpfulActions: [],
+      pinnedActions: [],
+      recentFamilies: []
     };
     const actions = selectActions('focus', null, ctx);
     expect(actions.find(a => a.id === 'F04')).toBeUndefined();

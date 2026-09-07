@@ -185,7 +185,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         // Try to keep the action that wasn't swapped, and just replace the one that was
         const otherAction = plan.actions.find(a => a.id !== actionIdToSwap);
         
-        const newActions = [];
+        const newActions: ActionContent[] = [];
         if (otherAction) newActions.push(otherAction);
         
         // Add a new one from candidates that isn't the other action
