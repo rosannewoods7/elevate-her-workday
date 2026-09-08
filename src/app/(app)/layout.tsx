@@ -4,9 +4,21 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { CheckCircle, Calendar, LineChart, MessageCircle, BookOpen, ClipboardEdit } from 'lucide-react';
 
+import { useAppStore } from '@/lib/store';
+import { useEffect } from 'react';
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { profile } = useAppStore();
+
+  useEffect(() => {
+    if (!profile) {
+      router.push('/onboarding');
+    }
+  }, [profile, router]);
+
+  if (!profile) return null;
 
   return (
     <div className="flex flex-col h-screen bg-[var(--background)]">

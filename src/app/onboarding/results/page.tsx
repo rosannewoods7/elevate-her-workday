@@ -5,6 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { Domain } from '@/lib/types';
 
+const DOMAIN_LABELS: Record<Domain, string> = {
+  focus: 'Protecting time and focus',
+  energy: 'Managing physical energy and pacing',
+  recovery: 'Improving detachment and evening recovery',
+  load: 'Reducing administrative or cognitive load',
+  comfort: 'Managing physical comfort and environment',
+  support: 'Getting better support from my team or manager',
+  general: 'Balanced Mix'
+};
+
 export default function Results() {
   const router = useRouter();
   const { profile, updateProfile } = useAppStore();
@@ -14,11 +24,6 @@ export default function Results() {
 
   const handleContinue = () => {
     router.push('/today');
-  };
-
-  const handleChangePriority = (newDomain: Domain) => {
-    updateProfile({ confirmed_primary: newDomain });
-    setIsEditingPriority(false);
   };
 
   const domainExplanations: Record<string, string> = {
@@ -32,89 +37,81 @@ export default function Results() {
   };
 
   return (
-    <main className="min-h-screen bg-[var(--background)] p-6 text-[var(--foreground)] pb-24 font-sans flex flex-col justify-center">
-      <div className="max-w-md mx-auto w-full space-y-6 mt-12">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-serif font-bold text-[var(--primary)]">Your Profile Summary</h1>
-          <p className="text-gray-800 mt-2">Here is a structured look at the friction you are experiencing.</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-[var(--accent-1)] space-y-6">
+    <main className="min-h-screen bg-[var(--eh-mauve)] p-4 text-white pb-24 font-sans flex flex-col items-center">
+      <div className="max-w-md w-full space-y-6 mt-8 animate-in slide-in-from-bottom-4 duration-500">
+        <h1 className="text-3xl font-serif font-bold text-[var(--eh-lilac)] text-center">Your Profile is Ready</h1>
+        
+        <div className="bg-white p-6 rounded-[var(--eh-card-radius)] shadow-[var(--eh-shadow)] space-y-6 border border-[var(--eh-line)]">
           <div>
-            <div className="flex justify-between items-start">
-              <span className="text-xs font-bold uppercase text-gray-500 tracking-wider">Calculated Priority</span>
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-xs font-bold text-[var(--eh-muted)] uppercase tracking-wider">Primary Focus</h3>
               {!isEditingPriority && (
-                <button onClick={() => setIsEditingPriority(true)} className="text-[var(--primary)] text-xs font-bold hover:underline">
-                  Change Priority
+                <button onClick={() => setIsEditingPriority(true)} className="text-[var(--eh-plum)] text-xs font-bold hover:underline">
+                  Change
                 </button>
               )}
             </div>
             
             {isEditingPriority ? (
               <div className="mt-3 space-y-2">
-                {['focus', 'energy', 'recovery', 'load', 'comfort', 'support'].map((d) => (
+                {(Object.keys(DOMAIN_LABELS) as Domain[]).map((d) => (
                   <button 
                     key={d} 
-                    onClick={() => handleChangePriority(d as Domain)}
-                    className="w-full text-left p-3 border border-gray-200 rounded-lg text-sm capitalize hover:border-[var(--primary)] hover:bg-gray-50"
+                    onClick={() => {
+                        updateProfile({ confirmed_primary: d });
+                        setIsEditingPriority(false);
+                    }}
+                    className="w-full text-left p-3 border border-[var(--eh-line)] rounded-[var(--eh-control-radius)] text-sm text-[var(--eh-ink)] capitalize hover:border-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]"
                   >
-                    {d}
+                    {DOMAIN_LABELS[d]}
                   </button>
                 ))}
-                <button onClick={() => setIsEditingPriority(false)} className="w-full text-center p-2 text-gray-500 text-sm mt-2">Cancel</button>
+                <button onClick={() => setIsEditingPriority(false)} className="w-full text-center p-2 text-[var(--eh-muted)] text-sm mt-2 font-bold">Cancel</button>
               </div>
             ) : (
               <>
-                <h3 className="font-serif text-2xl font-bold text-[var(--primary)] capitalize mt-1">
-                  {profile.confirmed_primary}
+                <h3 className="font-serif text-2xl font-bold text-[var(--eh-plum)] capitalize mt-1">
+                  {DOMAIN_LABELS[profile.confirmed_primary as Domain] || 'General Strategy'}
                 </h3>
-                <p className="text-sm text-gray-800 mt-2 leading-relaxed bg-[#faf8f9] p-3 rounded-lg border-l-2 border-[var(--primary)]">
+                <p className="text-sm text-[var(--eh-ink)] mt-2 leading-relaxed bg-[var(--eh-canvas)] p-3 rounded-[var(--eh-control-radius)] border-l-2 border-[var(--eh-plum)]">
                   {domainExplanations[profile.confirmed_primary as string] || domainExplanations.general}
                 </p>
               </>
             )}
           </div>
 
-          <div className="border-t border-gray-100 pt-6 mt-6">
-            <span className="text-xs font-bold uppercase text-gray-500 tracking-wider">Interference Snapshot</span>
+          <div className="border-t border-[var(--eh-line)] pt-6 mt-6">
+            <span className="text-xs font-bold uppercase text-[var(--eh-muted)] tracking-wider">Interference Snapshot</span>
             <div className="space-y-3 mt-4">
               {Object.entries(profile.interference || {}).map(([domain, value]) => {
                 const numVal = value as number;
                 if (numVal === null) return null;
                 const level = numVal === 0 ? 'None' : numVal === 1 ? 'Mild' : numVal === 2 ? 'Moderate' : 'Severe';
-                const color = numVal === 0 ? 'text-gray-400' : numVal === 1 ? 'text-green-600' : numVal === 2 ? 'text-orange-500' : 'text-red-600';
+                const color = numVal === 0 ? 'text-[var(--eh-muted)]' : numVal === 1 ? 'text-[#849b87]' : numVal === 2 ? 'text-[#e6b360]' : 'text-[#c67373]';
                 return (
                   <div key={domain} className="flex justify-between items-center text-sm">
-                    <span className="capitalize text-gray-700">{domain}</span>
+                    <span className="capitalize font-bold text-[var(--eh-ink)]">{DOMAIN_LABELS[domain as Domain] || domain}</span>
                     <span className={`font-bold ${color}`}>{level} ({numVal}/3)</span>
                   </div>
                 );
               })}
               {Object.keys(profile.interference || {}).length === 0 && (
-                <p className="text-sm text-gray-500 italic">No specific interference recorded.</p>
+                <p className="text-sm text-[var(--eh-muted)] italic">No specific interference recorded.</p>
               )}
             </div>
           </div>
-
-          <div className="border-t border-gray-100 pt-6">
-            <span className="text-xs font-bold uppercase text-gray-500 tracking-wider">How The Plan Works</span>
-            <p className="text-sm text-gray-600 mt-3 leading-relaxed">
-              Every day, you will receive two highly specific actions designed to address your priority focus. 
-              You don't need to do everything. Treat these actions as a menu, not a mandate. You will also receive a "fallback" option in case your day completely derails.
-            </p>
-          </div>
         </div>
 
-        <div className="space-y-3 pt-4">
+        <div className="space-y-3 pt-2">
           <button 
             onClick={handleContinue}
-            className="w-full py-4 bg-[var(--primary)] text-white font-bold rounded-lg shadow-lg hover:shadow-xl hover:opacity-90 transition-all"
+            className="w-full py-4 bg-[var(--eh-plum)] text-white font-bold rounded-[var(--eh-control-radius)] shadow-lg hover:shadow-xl hover:opacity-90 transition-all"
           >
             Generate My First Plan
           </button>
           <button 
             onClick={() => router.push('/onboarding')}
-            className="w-full py-4 bg-transparent border border-gray-300 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition-all"
+            className="w-full py-4 bg-transparent border border-white text-white font-bold rounded-[var(--eh-control-radius)] hover:bg-white hover:text-[var(--eh-plum)] transition-all"
           >
             Retake Assessment
           </button>

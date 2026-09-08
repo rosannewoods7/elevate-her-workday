@@ -163,9 +163,6 @@ export default function Today() {
         <button onClick={handleShowPlan} className="w-full py-4 text-white font-bold hover:text-[var(--eh-lilac)] transition-colors">
           Use My Saved Plan
         </button>
-        <Link href="/log" className="block w-full text-center py-2 text-[var(--eh-lilac)] font-medium text-sm hover:underline">
-          Record a symptom or concern (Optional Log)
-        </Link>
       </div>
     );
   }
@@ -173,7 +170,7 @@ export default function Today() {
   if (!plan) return null;
 
   return (
-    <div className="p-6 max-w-md mx-auto space-y-6 pb-24 font-sans">
+    <div className="p-4 md:p-6 max-w-md mx-auto space-y-6 pb-24 font-sans">
       <div className="text-center space-y-2 mb-8">
         <h1 className="text-3xl font-serif font-bold text-[var(--eh-lilac)]">Plan for Today</h1>
         <p className="text-[var(--eh-lilac)] text-sm">Review your suggested actions or ask for an alternative.</p>

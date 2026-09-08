@@ -24,7 +24,7 @@ export function InstallPrompt() {
     setDismissed(hasDismissed);
   }, []);
 
-  if (isStandalone || dismissed) return null;
+  if (isStandalone) return null;
 
   const handleDismiss = () => {
     localStorage.setItem('eh_pwa_dismissed', 'true');
