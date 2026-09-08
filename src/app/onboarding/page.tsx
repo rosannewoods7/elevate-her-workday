@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { Domain, Profile, WorkContext, Control, DemandTag, EffortBudget, PriorTool } from '@/lib/types';
@@ -25,6 +25,10 @@ export default function Onboarding() {
   const [priorTools, setPriorTools] = useState<PriorTool[]>([]);
   const [supportPref, setSupportPref] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<string[]>([]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => Math.max(0, s - 1));
@@ -296,16 +300,16 @@ export default function Onboarding() {
             {/* Q09 */}
             <div className="border-t pt-6">
               <p className="font-semibold text-[var(--eh-ink)] mb-3 text-sm">9. Which days would you usually use a workday plan?</p>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="flex flex-wrap gap-2">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
                   <button 
                     key={day} onClick={() => toggleArray(schedule, setSchedule, day, undefined, ['variable'])}
-                    className={`p-2 text-xs rounded-lg border text-center ${schedule.includes(day) ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
+                    className={`p-2 text-xs rounded-lg border text-center flex-1 min-w-[3.5rem] ${schedule.includes(day) ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
                   >{day}</button>
                 ))}
                 <button 
                   onClick={() => setSchedule(['variable'])}
-                  className={`p-2 text-xs rounded-lg border text-center ${schedule.includes('variable') ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
+                  className={`p-2 text-xs rounded-lg border text-center flex-1 min-w-[4.5rem] ${schedule.includes('variable') ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
                 >Variable</button>
               </div>
             </div>

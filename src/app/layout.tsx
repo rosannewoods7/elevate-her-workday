@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: "Elevate HER Workday",
   description: "A practical plan for the days work feels harder.",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

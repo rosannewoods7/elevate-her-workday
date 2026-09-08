@@ -24,6 +24,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [profile, router, mounted]);
 
+  useEffect(() => {
+    const mainContent = document.getElementById('main-scroll-container');
+    if (mainContent) {
+      mainContent.scrollTop = 0;
+    }
+  }, [pathname]);
+
   if (!mounted) return null;
   if (!profile) return null;
 
@@ -65,16 +72,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </div>
 
-      <main className="flex-1 overflow-y-auto pb-8 relative">
+      <main id="main-scroll-container" className="flex-1 overflow-y-auto pb-8 relative">
         <InstallPrompt />
         {children}
       </main>
-
-      <footer className="w-full bg-[var(--eh-paper)] border-t border-[var(--eh-line)] p-4 text-center pb-safe">
-        <Link href="/support" className="text-sm font-bold text-[var(--eh-plum)] hover:underline flex items-center justify-center gap-2">
-          <MessageCircle size={16} /> Need a workplace or healthcare adjustment? Open Support
-        </Link>
-      </footer>
     </div>
   );
 }
