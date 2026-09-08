@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ChevronLeft } from 'lucide-react';
 
@@ -11,6 +12,7 @@ const SupportPDFDownload = dynamic(
 
 export default function SupportPage() {
   const [activeBuilder, setActiveBuilder] = useState<'none' | 'work' | 'health'>('none');
+  const router = useRouter();
 
   if (activeBuilder === 'none') {
     return (
@@ -18,6 +20,17 @@ export default function SupportPage() {
         <div className="max-w-md mx-auto space-y-6 w-full">
           <h1 className="text-3xl font-serif font-bold text-[var(--eh-lilac)] leading-tight text-center">Prepare the conversation that matters.</h1>
           
+                    <button 
+            onClick={() => router.push('/prepare')}
+            className="w-full bg-[var(--eh-paper)] p-6 rounded-[var(--eh-card-radius)] shadow-[var(--eh-shadow)] border border-[var(--eh-plum)] text-left hover:border-[var(--eh-mauve)] transition-all group"
+          >
+            <h2 className="text-xl font-serif font-bold text-[var(--eh-plum)]">Prepare me for...</h2>
+            <p className="text-[var(--eh-muted)] text-sm mt-2 mb-4 leading-relaxed">Build a 5-step preparation brief for difficult meetings, tasks, or unpredictable days.</p>
+            <span className="inline-block bg-[var(--eh-plum)] text-white text-sm font-bold py-2 px-4 rounded-[var(--eh-control-radius)] group-hover:opacity-90">Start Preparation Brief</span>
+          </button>
+          
+          <div className="h-px w-full bg-white/20 my-4" />
+
           <button 
             onClick={() => setActiveBuilder('work')}
             className="w-full bg-[var(--eh-paper)] p-6 rounded-[var(--eh-card-radius)] shadow-[var(--eh-shadow)] border border-[var(--eh-line)] text-left hover:border-[var(--eh-mauve)] transition-all group"

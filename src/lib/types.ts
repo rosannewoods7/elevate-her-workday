@@ -39,6 +39,11 @@ export interface Profile {
   timezone: string;
   confirmed_primary: Domain | null;
   confirmed_secondary: Domain | null;
+  
+  // Premium Upgrades
+  offer_daily_check?: boolean;
+  discreet_mode?: boolean;
+  auto_cover_on_blur?: boolean;
 }
 
 export interface DailyPlan {
@@ -50,6 +55,12 @@ export interface DailyPlan {
   fallback: string;
   effective_controls: Control[];
   effective_demand: DemandTag[];
+  
+  // Daily Capacity Check Upgrades
+  capacity_revision_id?: string | null;
+  suggested_approach?: Approach | null;
+  selected_approach?: Approach | null;
+  approach_source?: 'suggested' | 'user_override' | 'skip' | 'profile_default' | null;
 }
 
 export interface DailyEntry {
@@ -67,3 +78,103 @@ export interface PlanCycle {
   goal: string | null;
   status: 'active' | 'paused' | 'completed';
 }
+
+export type Approach = 'usual' | 'supported' | 'simple';
+export type SleepAnswer = 'restorative' | 'somewhat_restorative' | 'not_restorative' | 'unsure' | null;
+export type EnergyAnswer = 'plenty' | 'some' | 'very_little' | 'unsure' | null;
+export type ClarityAnswer = 'clear' | 'somewhat_scattered' | 'difficult_to_concentrate' | 'unsure' | null;
+export type SettledAnswer = 'settled' | 'some_tension' | 'overwhelmed' | 'unsure' | null;
+export type Demand = 'routine' | 'concentration' | 'conversation' | 'presentation_decision' | 'unpredictable' | 'unsure';
+
+export interface CapacityAnswers {
+  sleep: SleepAnswer;
+  energy: EnergyAnswer;
+  clarity: ClarityAnswer;
+  settled: SettledAnswer;
+  demands: Demand[] | null;
+}
+
+export interface CapacityRevision {
+  id: string;
+  account_id: string;
+  local_work_date: string; // YYYY-MM-DD
+  timezone_at_entry: string;
+  revision: number;
+  status: 'draft' | 'completed' | 'skipped';
+  answers: CapacityAnswers;
+  suggested_approach: Approach | null;
+  suggested_focus: string | null;
+  reason_keys: string[];
+  algorithm_version: 'capacity-1.0';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PreparationBrief {
+  id: string;
+  account_id: string;
+  scenario_id: string;
+  event_local_date: string | null; // optional date
+  timezone: string | null;
+  user_title: string;
+  state: 'draft' | 'saved' | 'archived';
+  current_revision: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BriefRevision {
+  brief_id: string;
+  revision: number;
+  outcome_id: string | null;
+  outcome_text: string | null;
+  concern: string | null;
+  intended_outcome: string;
+  opening_sentence: string;
+  practical_preparation: string;
+  fallback: string;
+  leave_with: string;
+  provenance: 'template' | 'user' | 'source';
+  selected_approach: string | null; // 'usual' | 'supported' | 'simple' | 'independent'
+  capacity_revision_id: string | null;
+  version: 'experience-1.0';
+  created_at: string;
+}
+
+export interface PlaybookItem {
+  id: string;
+  account_id: string;
+  type: 'strategy' | 'work script' | 'fallback' | 'preparation brief';
+  source_id: string | null; // ID of the action, brief, etc
+  source_version: string | null;
+  snapshot_text: string | null; // preview text
+  user_title: string;
+  note: string | null;
+  pinned: boolean;
+  saved_to_try: boolean;
+  created_at: string;
+  last_used_at: string | null;
+  archived_at: string | null;
+}
+
+export interface PlaybookCollection {
+  id: string;
+  account_id: string;
+  category_key: string; // meetings, poor_sleep, priorities, support, changes, custom
+  custom_label: string | null;
+}
+
+export interface PlaybookMembership {
+  account_id: string;
+  item_id: string;
+  collection_id: string;
+}
+
+export interface DisplayPreference {
+  account_id: string;
+  discreet_enabled: boolean;
+  auto_cover_on_blur: boolean;
+  version: string;
+  updated_at: string;
+}
+

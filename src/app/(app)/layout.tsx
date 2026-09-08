@@ -2,11 +2,39 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { CheckCircle, Calendar, LineChart, MessageCircle, BookOpen, ClipboardEdit } from 'lucide-react';
+import { Bookmark, CheckCircle, Calendar, LineChart, MessageCircle, BookOpen, ClipboardEdit } from 'lucide-react';
 
 import { useAppStore } from '@/lib/store';
 import { useEffect, useState } from 'react';
 import { InstallPrompt } from '@/components/InstallPrompt';
+import { DiscreetProvider, useDiscreet } from '@/components/DiscreetProvider';
+import { EyeOff } from 'lucide-react';
+
+function HeaderControls() {
+  const router = useRouter();
+  const { setQuickCoverActive } = useDiscreet();
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => setQuickCoverActive(true)}
+        className="text-xs font-bold text-[var(--eh-plum)] uppercase tracking-wider hover:bg-[var(--eh-canvas)] px-2 py-1 rounded transition-colors flex items-center gap-1"
+      >
+        <EyeOff size={14} />
+        <span className="hidden sm:inline">Hide personal details</span>
+        <span className="sm:hidden">Hide</span>
+      </button>
+      <button 
+        onClick={() => {
+          router.push('/onboarding');
+        }}
+        className="text-xs font-bold text-[var(--eh-muted)] uppercase tracking-wider hover:text-[var(--eh-plum)] px-2 py-1 transition-colors"
+      >
+        Reset
+      </button>
+    </div>
+  );
+}
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -35,22 +63,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!profile) return null;
 
   return (
-    <div className="flex flex-col h-screen bg-[var(--background)]">
-      <div className="sticky top-0 z-20 bg-[var(--eh-paper)] shadow-sm border-b border-[var(--eh-line)]">
-        <header className="p-4 flex items-center justify-between border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Elevate HER" className="h-8 w-auto object-contain" />
-            <h1 className="font-serif font-bold text-lg text-[var(--eh-plum)]">Elevate HER Workday</h1>
-          </div>
-          <button 
-            onClick={() => {
-              router.push('/onboarding');
-            }}
-            className="text-xs font-bold text-[var(--eh-muted)] uppercase tracking-wider hover:text-[var(--eh-plum)] transition-colors"
-          >
-            Reset Profile
-          </button>
-        </header>
+    <DiscreetProvider>
+      <div className="flex flex-col h-screen bg-[var(--background)]">
+        <div className="sticky top-0 z-20 bg-[var(--eh-paper)] shadow-sm border-b border-[var(--eh-line)]">
+          <header className="p-4 flex items-center justify-between border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="Elevate HER" className="h-8 w-auto object-contain" />
+              <h1 className="font-serif font-bold text-lg text-[var(--eh-plum)]">Elevate HER Workday</h1>
+            </div>
+            <HeaderControls />
+          </header>
 
         <nav className="w-full flex justify-around items-center h-16 px-1">
           {[
@@ -60,6 +82,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             { href: '/patterns', label: 'Patterns', icon: <LineChart size={18} /> },
             { href: '/education', label: 'Learn', icon: <BookOpen size={18} /> },
             { href: '/support', label: 'Support', icon: <MessageCircle size={18} /> },
+            { href: '/playbook', label: 'Playbook', icon: <Bookmark size={18} /> },
           ].map((item) => (
             <NavItem 
               key={item.href}
@@ -77,6 +100,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     </div>
+    </DiscreetProvider>
   );
 }
 
@@ -84,7 +108,7 @@ function NavItem({ href, label, icon, active }: { href: string, label: string, i
   return (
     <Link href={href} className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${active ? 'text-[var(--eh-plum)]' : 'text-[var(--eh-muted)] hover:text-[var(--eh-mauve)]'}`}>
       {icon}
-      <span className="text-xs font-bold">{label}</span>
+      <span className="text-[10px] sm:text-xs font-bold">{label}</span>
     </Link>
   );
 }

@@ -3,7 +3,8 @@ import { actionLibrary } from './action-library';
 
 const DOMAIN_ORDER: Domain[] = ['focus', 'energy', 'recovery', 'load', 'comfort', 'support'];
 
-export function getBudgetSeconds(budget: EffortBudget): number {
+export function getBudgetSeconds(budget: EffortBudget, approach?: 'usual' | 'supported' | 'simple' | null): number {
+  if (approach === 'simple') return 60; // Hard cap
   if (budget === 'flexible') return 300;
   if (budget === 'brief') return 120;
   return 60; // tiny or null
@@ -60,6 +61,7 @@ export interface RoutingContext {
   helpfulActions: string[];
   pinnedActions: string[];
   recentFamilies: string[]; // Families shown recently, to avoid duplicating
+  approach?: 'usual' | 'supported' | 'simple' | null;
 }
 
 function scoreAction(action: ActionContent, ctx: RoutingContext): number {
@@ -83,7 +85,7 @@ export function selectActions(
   secondaryDomain: Domain | null, 
   ctx: RoutingContext
 ): ActionContent[] {
-  const budgetSec = getBudgetSeconds(ctx.effortBudget);
+  const budgetSec = getBudgetSeconds(ctx.effortBudget, ctx.approach);
   
   const eligibleActions = actionLibrary.filter(action => {
     if (ctx.excludedActions.includes(action.id)) return false;
@@ -122,8 +124,35 @@ export function selectActions(
     }
   }
 
+  // Demand Preparation Preference (Supported / Simple)
+  if ((ctx.approach === 'supported' || ctx.approach === 'simple') && selected.length === 0) {
+    const DEMAND_MAP: Record<string, { domain: Domain, ids: string[] }> = {
+      conversation: { domain: 'support', ids: ['S01', 'S07', 'S06', 'S02', 'S05'] },
+      presentation_decision: { domain: 'focus', ids: ['F03', 'F09', 'F05', 'F01', 'F10'] },
+      concentration: { domain: 'focus', ids: ['F01', 'F05', 'F02', 'F06', 'F04'] },
+      unpredictable: { domain: 'load', ids: ['L02', 'L01', 'L04', 'L09', 'L08'] }
+    };
+    
+    let demandCardFound = false;
+    for (const demand of ctx.effectiveDemand) {
+      const mapping = DEMAND_MAP[demand];
+      if (mapping && mapping.domain === primaryDomain) {
+        for (const pid of mapping.ids) {
+          const card = eligibleActions.find(a => a.id === pid && (!a.family_id || !selectedFamilies.includes(a.family_id)));
+          if (card) {
+            selected.push(card);
+            if (card.family_id) selectedFamilies.push(card.family_id);
+            demandCardFound = true;
+            break;
+          }
+        }
+      }
+      if (demandCardFound) break;
+    }
+  }
+
   // Primary card
-  if (selected.length < 2) {
+  if (selected.length < (ctx.approach === 'simple' ? 1 : 2)) {
     const primaryActions = getSortedForDomain(primaryDomain, selectedFamilies);
     if (primaryActions.length > 0) {
       const card = primaryActions[0];
@@ -132,8 +161,8 @@ export function selectActions(
     }
   }
 
-  // Secondary card (or fallback to second primary)
-  if (selected.length < 2) {
+  // Secondary card
+  if (selected.length < (ctx.approach === 'simple' ? 1 : 2)) {
     if (secondaryDomain) {
       const secondaryActions = getSortedForDomain(secondaryDomain, selectedFamilies);
       if (secondaryActions.length > 0) {
@@ -147,19 +176,18 @@ export function selectActions(
     }
   }
 
-  // Deduplicate just in case
   const uniqueSelected = selected.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+  const maxCards = ctx.approach === 'simple' ? 1 : 2;
 
-  // Fill empty slots with G01 then G02
-  if (uniqueSelected.length < 2) {
+  if (uniqueSelected.length < maxCards) {
     const g01 = eligibleActions.find(a => a.id === 'G01');
     if (g01 && !uniqueSelected.find(a => a.id === 'G01')) uniqueSelected.push(g01);
   }
   
-  if (uniqueSelected.length < 2) {
+  if (uniqueSelected.length < maxCards) {
     const g02 = eligibleActions.find(a => a.id === 'G02');
     if (g02 && !uniqueSelected.find(a => a.id === 'G02')) uniqueSelected.push(g02);
   }
 
-  return uniqueSelected.slice(0, 2);
+  return uniqueSelected.slice(0, maxCards);
 }

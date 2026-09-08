@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { 
   Profile, 
   DailyPlan, 
@@ -23,10 +24,22 @@ export interface AppState {
   excludedActionsToday: Record<string, string[]>; // keyed by local_date
   helpfulActions: string[];
   
+  // Premium Upgrades (Local overrides for demo/testing until DB is wired)
+  capacityChecks: Record<string, any>;
+  saveCapacityCheck: (local_date: string, data: any) => void;
+  
+  preparationBriefs: Record<string, any>;
+  savePreparationBrief: (brief: any) => void;
+  deletePreparationBrief: (id: string) => void;
+  
+  playbookItems: Record<string, any>;
+  savePlaybookItem: (item: any) => void;
+  deletePlaybookItem: (id: string) => void;
+  
   setProfile: (profile: Profile) => void;
   updateProfile: (updates: Partial<Profile>) => void;
   
-  generateDailyPlan: (local_date: string, explicitFocus?: Domain, explicitControls?: Control[], explicitDemand?: DemandTag[]) => DailyPlan;
+  generateDailyPlan: (local_date: string, explicitFocus?: Domain, explicitControls?: Control[], explicitDemand?: DemandTag[], approach?: "usual" | "supported" | "simple" | null) => DailyPlan;
   saveDailyPlan: (plan: DailyPlan) => void;
   
   saveDailyEntry: (entry: DailyEntry) => void;
@@ -54,7 +67,9 @@ const defaultProfile: Profile = {
   confirmed_secondary: null,
 };
 
-export const useAppStore = create<AppState>()((set, get) => ({
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
       profile: null,
       dailyPlans: {},
       dailyEntries: {},
@@ -62,13 +77,37 @@ export const useAppStore = create<AppState>()((set, get) => ({
       excludedActionsPerm: [],
       excludedActionsToday: {},
       helpfulActions: [],
+      capacityChecks: {},
+      saveCapacityCheck: (local_date, data) => set((state) => ({
+        capacityChecks: { ...state.capacityChecks, [local_date]: data }
+      })),
+      
+      preparationBriefs: {},
+      savePreparationBrief: (brief) => set((state) => ({
+        preparationBriefs: { ...state.preparationBriefs, [brief.id]: brief }
+      })),
+      deletePreparationBrief: (id) => set((state) => {
+        const next = { ...state.preparationBriefs };
+        delete next[id];
+        return { preparationBriefs: next };
+      }),
+      
+      playbookItems: {},
+      savePlaybookItem: (item) => set((state) => ({
+        playbookItems: { ...state.playbookItems, [item.id]: item }
+      })),
+      deletePlaybookItem: (id) => set((state) => {
+        const next = { ...state.playbookItems };
+        delete next[id];
+        return { playbookItems: next };
+      }),
       
       setProfile: (profile) => set({ profile }),
       updateProfile: (updates) => set((state) => ({ 
         profile: state.profile ? { ...state.profile, ...updates } : { ...defaultProfile, ...updates } 
       })),
       
-      generateDailyPlan: (local_date, explicitFocus, explicitControls, explicitDemand) => {
+      generateDailyPlan: (local_date, explicitFocus, explicitControls, explicitDemand, approach) => {
         const state = get();
         const profile = state.profile || defaultProfile;
         
@@ -98,7 +137,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
           excludedActions: [...excludedPerm, ...excludedToday],
           helpfulActions: state.helpfulActions,
           pinnedActions: [],
-          recentFamilies: []
+          recentFamilies: [], approach
         };
         
         const actions = selectActions(focus, profile.confirmed_secondary, ctx);
@@ -112,7 +151,10 @@ export const useAppStore = create<AppState>()((set, get) => ({
           completed_actions: [],
           fallback: finalActions.length > 0 ? finalActions[0].fallback : 'If the day changes, I’ll choose the next useful step again.',
           effective_controls: effectiveControls,
-          effective_demand: effectiveDemand
+          effective_demand: effectiveDemand,
+          suggested_approach: approach,
+          selected_approach: approach,
+          approach_source: approach ? "suggested" : null
         };
       },
       
@@ -209,4 +251,9 @@ export const useAppStore = create<AppState>()((set, get) => ({
         excludedActionsToday: {},
         helpfulActions: [],
       })
-}));
+    }),
+    {
+      name: 'elevate-her-storage',
+    }
+  )
+);

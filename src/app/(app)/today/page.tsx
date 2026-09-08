@@ -7,9 +7,11 @@ import Link from 'next/link';
 import { actionLibrary } from '@/lib/action-library';
 import { DownloadPlanButton } from '@/components/PlanPDF';
 import { EvidenceDrawer } from '@/components/EvidenceDrawer';
+import { DailyCapacityCheck } from '@/components/DailyCapacityCheck';
+import { BookmarkPlus } from 'lucide-react';
 
 export default function Today() {
-  const { profile, dailyPlans, generateDailyPlan, saveDailyPlan, resetDemo } = useAppStore();
+  const { profile, dailyPlans, generateDailyPlan, saveDailyPlan, resetDemo, savePlaybookItem } = useAppStore();
   
   const [localDate, setLocalDate] = useState('');
   useEffect(() => {
@@ -46,6 +48,19 @@ export default function Today() {
   const handleSwap = (actionId: string) => {
     // We get swapAction from the store
     useAppStore.getState().swapAction(localDate, actionId);
+  };
+
+  const handleSaveStrategy = (action: any) => {
+    savePlaybookItem({
+      id: `pb-${Date.now()}`,
+      type: 'strategy',
+      source_id: action.id,
+      user_title: action.title,
+      pinned: false,
+      saved_to_try: false,
+      created_at: new Date().toISOString()
+    });
+    alert('Saved to My Playbook!');
   };
 
   const handleDayChanged = () => {
@@ -170,17 +185,30 @@ export default function Today() {
 
   return (
     <div className="p-4 md:p-6 max-w-md mx-auto space-y-6 pb-24 font-sans">
-      <div className="text-center space-y-2 mb-8">
+            <div className="mb-8">
         <h1 className="text-3xl font-serif font-bold text-[var(--eh-lilac)]">Plan for Today</h1>
-        <p className="text-[var(--eh-lilac)] text-sm">Review your suggested actions or ask for an alternative.</p>
+        {plan.selected_approach && plan.selected_approach !== 'usual' ? (
+          <div className="mt-2 inline-block bg-[var(--eh-plum)] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+            {plan.selected_approach} Approach
+          </div>
+        ) : (
+          <p className="text-[var(--eh-lilac)] text-sm mt-1">Review your suggested actions or ask for an alternative.</p>
+        )}
       </div>
 
 
 
       <div className="space-y-6">
         {plan.actions.map((action, idx) => (
-          <div key={action.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4">
-            <h3 className="font-serif font-bold text-xl text-[var(--primary)]">{action.title}</h3>
+          <div key={action.id} className="bg-white p-6 rounded-[var(--eh-card-radius)] shadow-sm border border-gray-100 space-y-4 relative group">
+              <button 
+                onClick={() => handleSaveStrategy(action)}
+                className="absolute top-4 right-4 p-2 text-gray-300 hover:text-[var(--eh-plum)] hover:bg-gray-50 rounded-full transition-colors"
+                title="Keep in Playbook"
+              >
+                <BookmarkPlus size={20} />
+              </button>
+              <h3 className="font-serif font-bold text-xl text-[var(--eh-plum)] pr-8">{action.title}</h3>
             <p className="text-gray-800 leading-relaxed">{action.instruction}</p>
             <div className="flex gap-3 pt-2">
               <button 
@@ -251,12 +279,22 @@ export default function Today() {
           </div>
         </div>
 
-        <div className="mt-8 bg-white p-5 rounded-xl shadow-sm border border-[var(--accent-1)]">
-          <h4 className="font-serif font-bold text-[var(--primary)] mb-1">What is a "Harder Window"?</h4>
-          <p className="text-sm text-gray-700 leading-relaxed">
-            A <em>harder window</em> refers to the specific time of day when your symptoms (like brain fog, fatigue, or discomfort) or your work demands (like school pick-ups or intense meetings) typically peak. 
-            Identifying this window helps you avoid scheduling your most demanding tasks during your lowest capacity times.
-          </p>
+        {plan.actions.some(a => (a.title + ' ' + a.instruction).toLowerCase().includes('harder window')) && (
+          <div className="mt-8 bg-white p-5 rounded-[var(--eh-card-radius)] shadow-[var(--eh-shadow)] border border-[var(--eh-plum)]">
+            <h4 className="font-serif font-bold text-[var(--eh-plum)] mb-1">What is a "Harder Window"?</h4>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              A <em>harder window</em> refers to the specific time of day when your symptoms (like brain fog, fatigue, or discomfort) or your work demands (like school pick-ups or intense meetings) typically peak. 
+              Identifying this window helps you avoid scheduling your most demanding tasks during your lowest capacity times.
+            </p>
+          </div>
+        )}
+        
+        <div className="mt-8 bg-white p-6 rounded-[var(--eh-card-radius)] shadow-[var(--eh-shadow)] border border-[var(--eh-line)]">
+          <h3 className="font-serif font-bold text-xl text-[var(--eh-plum)] mb-2">Prepare me for...</h3>
+          <p className="text-[var(--eh-muted)] text-sm mb-4">Build a 5-step preparation brief for difficult meetings, tasks, or unpredictable days.</p>
+          <Link href="/prepare" className="block text-center w-full bg-white text-[var(--eh-plum)] border border-[var(--eh-plum)] font-bold py-3 px-4 rounded-[var(--eh-control-radius)] hover:bg-[var(--eh-canvas)] transition-colors">
+            Start Preparation Brief
+          </Link>
         </div>
       </div>
     </div>
