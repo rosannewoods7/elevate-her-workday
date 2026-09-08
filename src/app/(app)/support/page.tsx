@@ -129,7 +129,7 @@ function WorkBuilder({ onBack }: { onBack: () => void }) {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-bold text-white mb-1">1. Who is the audience?</label>
-          <select value={audience} onChange={e => setAudience(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white">
+          <select value={audience} onChange={e => setAudience(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white text-[var(--eh-ink)]">
             <option value="">Select an audience...</option>
             <option value="CEO">CEO / Line Leader</option>
             <option value="Board">Board Chair</option>
@@ -141,7 +141,7 @@ function WorkBuilder({ onBack }: { onBack: () => void }) {
 
         <div>
           <label className="block text-sm font-bold text-white mb-1">2. What is the situation?</label>
-          <select value={situation} onChange={e => setSituation(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white">
+          <select value={situation} onChange={e => setSituation(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white text-[var(--eh-ink)]">
             <option value="">Custom (Type it yourself)...</option>
             <option value="competing_priorities">Competing priorities</option>
             <option value="board_prep">Quality of board preparation</option>
@@ -240,15 +240,37 @@ function HealthBuilder({ onBack }: { onBack: () => void }) {
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-bold text-white mb-1">2. Approximate start date (or Not sure)?</label>
-          <input type="text" placeholder="e.g. Started gradually over the last few months" value={onset} onChange={e => setOnset(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white text-[var(--eh-ink)]" />
-        </div>
+          <div>
+            <label className="block text-sm font-bold text-white mb-1">2. Approximate start date?</label>
+            <select value={onset} onChange={e => setOnset(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white text-[var(--eh-ink)]">
+              <option value="">Select start date...</option>
+              <option value="Today">Today</option>
+              <option value="This week">This week</option>
+              <option value="This month">This month</option>
+              <option value="Gradually">Gradually</option>
+              <option value="Not sure">Not sure</option>
+              <option value="Other">Other (Write below)</option>
+            </select>
+            {onset === 'Other' && (
+              <input type="text" placeholder="Specify..." onChange={e => setOnset(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm mt-2 text-[var(--eh-ink)] bg-white" />
+            )}
+          </div>
 
-        <div>
-          <label className="block text-sm font-bold text-white mb-1">3. Work impact example:</label>
-          <input type="text" placeholder="e.g. Requiring extra checking at work" value={impact} onChange={e => setImpact(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white text-[var(--eh-ink)]" />
-        </div>
+          <div>
+            <label className="block text-sm font-bold text-white mb-1">3. Work impact example:</label>
+            <select value={impact} onChange={e => setImpact(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm bg-white text-[var(--eh-ink)]">
+              <option value="">Select impact...</option>
+              <option value="Requiring extra checking at work">Requiring extra checking at work</option>
+              <option value="Taking longer to complete tasks">Taking longer to complete tasks</option>
+              <option value="Needing more frequent breaks">Needing more frequent breaks</option>
+              <option value="Struggling to stay focused in meetings">Struggling to stay focused in meetings</option>
+              <option value="Having difficulty retaining new information">Having difficulty retaining new information</option>
+              <option value="Other">Other (Write below)</option>
+            </select>
+            {impact === 'Other' && (
+              <input type="text" placeholder="Specify impact..." onChange={e => setImpact(e.target.value)} className="w-full p-3 rounded-[var(--eh-control-radius)] border border-[var(--eh-line)] text-sm mt-2 text-[var(--eh-ink)] bg-white" />
+            )}
+          </div>
 
         <div>
           <label className="block text-sm font-bold text-white mb-2">4. Questions for the clinician (Select all that apply):</label>

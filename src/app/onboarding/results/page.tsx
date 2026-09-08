@@ -89,9 +89,9 @@ export default function Results() {
                 const level = numVal === 0 ? 'None' : numVal === 1 ? 'Mild' : numVal === 2 ? 'Moderate' : 'Severe';
                 const color = numVal === 0 ? 'text-[var(--eh-muted)]' : numVal === 1 ? 'text-[#849b87]' : numVal === 2 ? 'text-[#e6b360]' : 'text-[#c67373]';
                 return (
-                  <div key={domain} className="flex justify-between items-center text-sm">
-                    <span className="capitalize font-bold text-[var(--eh-ink)]">{DOMAIN_LABELS[domain as Domain] || domain}</span>
-                    <span className={`font-bold ${color}`}>{level} ({numVal}/3)</span>
+                  <div key={domain} className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm mb-3">
+                    <span className="font-bold text-[var(--eh-ink)] mb-1 sm:mb-0 leading-tight">{DOMAIN_LABELS[domain as Domain] || domain}</span>
+                    <span className={`font-bold ${color} text-xs uppercase tracking-wider`}>{level} ({numVal}/3)</span>
                   </div>
                 );
               })}

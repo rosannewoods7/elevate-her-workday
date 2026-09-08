@@ -94,14 +94,14 @@ export default function Planner() {
           <div className="p-4 border border-gray-200 rounded-lg">
             <span className="text-xs font-bold uppercase text-gray-500">Action 1 to Try</span>
             <p className="font-medium text-gray-800">{recentPlan?.actions[0]?.title || 'Give the task a starting point'}</p>
-            <input type="text" placeholder="When might I use this? (e.g. 9am meetings)" className="mt-2 w-full text-sm border-b border-gray-300 focus:outline-none focus:border-[var(--primary)] pb-1" />
+              <input type="text" placeholder="When might I use this? (e.g. 9am meetings)" className="mt-3 w-full p-3 border border-[var(--eh-line)] rounded-[var(--eh-control-radius)] text-sm bg-white text-[var(--eh-ink)] focus:outline-none" />
           </div>
           
           {recentPlan?.actions[1] && (
             <div className="p-4 border border-gray-200 rounded-lg">
               <span className="text-xs font-bold uppercase text-gray-500">Action 2 to Try</span>
               <p className="font-medium text-gray-800">{recentPlan?.actions[1]?.title}</p>
-              <input type="text" placeholder="When might I use this?" className="mt-2 w-full text-sm border-b border-gray-300 focus:outline-none focus:border-[var(--primary)] pb-1" />
+              <input type="text" placeholder="When might I use this?" className="mt-3 w-full p-3 border border-[var(--eh-line)] rounded-[var(--eh-control-radius)] text-sm bg-white text-[var(--eh-ink)] focus:outline-none" />
             </div>
           )}
         </div>

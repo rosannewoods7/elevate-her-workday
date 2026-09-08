@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, BlobProvider } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
   page: {
@@ -216,19 +216,21 @@ export function SupportPDFDownload({ type, workData, healthData, disabled }: { t
   const doc = type === 'work' && workData ? <WorkPDF data={workData} /> : type === 'health' && healthData ? <HealthPDF data={healthData} /> : <Document><Page></Page></Document>;
 
   return (
-    <PDFDownloadLink 
-      document={doc} 
-      fileName={`${type === 'work' ? 'Work_Adjustment_Request' : 'Healthcare_Preparation'}.pdf`}
-    >
-      {({ loading }) =>
-        loading ? (
-          <button className="w-full py-4 bg-[var(--eh-lilac)] text-[var(--eh-mauve)] font-bold rounded-lg">Generating PDF...</button>
+    <BlobProvider document={doc}>
+      {({ url, loading }) =>
+        loading || !url ? (
+          <button className="w-full py-4 bg-[var(--eh-lilac)] text-[var(--eh-mauve)] font-bold rounded-[var(--eh-control-radius)]">Generating PDF...</button>
         ) : (
-          <button className="w-full py-4 bg-[var(--eh-plum)] text-white font-bold rounded-lg shadow-[var(--eh-shadow)] hover:opacity-90 transition-all">
-            Download Preparation PDF
-          </button>
+          <a 
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="w-full block text-center py-4 bg-[var(--eh-plum)] text-white font-bold rounded-[var(--eh-control-radius)] shadow-[var(--eh-shadow)] hover:opacity-90 transition-all"
+          >
+            Open Preparation PDF
+          </a>
         )
       }
-    </PDFDownloadLink>
+    </BlobProvider>
   );
 }

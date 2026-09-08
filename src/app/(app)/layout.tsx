@@ -6,6 +6,7 @@ import { CheckCircle, Calendar, LineChart, MessageCircle, BookOpen, ClipboardEdi
 
 import { useAppStore } from '@/lib/store';
 import { useEffect } from 'react';
+import { InstallPrompt } from '@/components/InstallPrompt';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -58,7 +59,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </div>
 
-      <main className="flex-1 overflow-y-auto pb-8">
+      <main className="flex-1 overflow-y-auto pb-8 relative">
+        <InstallPrompt />
         {children}
       </main>
 

@@ -135,7 +135,7 @@ export default function Onboarding() {
                 ].map(opt => (
                   <label key={opt.id} className="flex items-start space-x-3 p-3 bg-[var(--eh-canvas)] rounded-lg cursor-pointer border border-transparent hover:border-[var(--accent-1)]">
                     <input type="radio" name="goal" checked={goal === opt.id} onChange={() => setGoal(opt.id as any)} className="mt-1" />
-                    <span className="text-sm">{opt.label}</span>
+                    <span className="text-sm text-[var(--eh-ink)]">{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -190,7 +190,7 @@ export default function Onboarding() {
                 {[{ id: 'desk', label: 'Mostly desk-based' }, { id: 'people', label: 'Mostly with people' }, { id: 'mixed', label: 'A mixture' }, { id: 'variable', label: 'It changes' }].map(opt => (
                   <button 
                     key={opt.id} onClick={() => setWorkContext(opt.id as any)}
-                    className={`p-3 text-xs rounded-lg border text-center ${workContext === opt.id ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] border-[var(--eh-line)]'}`}
+                    className={`p-3 text-xs rounded-lg border text-center ${workContext === opt.id ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
                   >{opt.label}</button>
                 ))}
               </div>
@@ -210,7 +210,7 @@ export default function Onboarding() {
                 ].map(opt => (
                   <label key={opt.id} className="flex items-center space-x-3 p-3 bg-[var(--eh-canvas)] rounded-lg cursor-pointer">
                     <input type="checkbox" checked={controls.includes(opt.id as any)} onChange={() => toggleArray(controls, setControls, opt.id, undefined, ['none', 'unknown'])} />
-                    <span className="text-sm">{opt.label}</span>
+                    <span className="text-sm text-[var(--eh-ink)]">{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -223,7 +223,7 @@ export default function Onboarding() {
                 {[{ id: 'interruptions', label: 'Interruptions' }, { id: 'meetings', label: 'Back-to-back meetings' }, { id: 'deadlines', label: 'Competing deadlines' }, { id: 'public_facing', label: 'Working with people' }, { id: 'unpredictable', label: 'Unexpected changes' }, { id: 'outside_work', label: 'Outside responsibilities' }, { id: 'none', label: 'None' }, { id: 'unknown', label: 'Not sure' }].map(opt => (
                   <button 
                     key={opt.id} onClick={() => toggleArray(demandTags, setDemandTags, opt.id, 2, ['none', 'unknown'])}
-                    className={`p-2 text-xs rounded-lg border text-center ${demandTags.includes(opt.id as any) ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] border-[var(--eh-line)]'}`}
+                    className={`p-2 text-xs rounded-lg border text-center ${demandTags.includes(opt.id as any) ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
                   >{opt.label}</button>
                 ))}
               </div>
@@ -236,7 +236,7 @@ export default function Onboarding() {
                 {[{ id: 'tiny', label: 'About a minute' }, { id: 'brief', label: 'About two minutes' }, { id: 'flexible', label: 'Up to five minutes' }].map(opt => (
                   <button 
                     key={opt.id} onClick={() => setEffortBudget(opt.id as any)}
-                    className={`w-full p-3 text-sm rounded-lg border text-left ${effortBudget === opt.id ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] border-[var(--eh-line)]'}`}
+                    className={`w-full p-3 text-sm rounded-lg border text-left ${effortBudget === opt.id ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
                   >{opt.label}</button>
                 ))}
               </div>
@@ -268,7 +268,7 @@ export default function Onboarding() {
                 ].map(opt => (
                   <label key={opt.id} className="flex items-center space-x-3 p-3 bg-[var(--eh-canvas)] rounded-lg cursor-pointer">
                     <input type="checkbox" checked={priorTools.includes(opt.id as any)} onChange={() => toggleArray(priorTools, setPriorTools, opt.id, undefined, ['none'])} />
-                    <span className="text-sm">{opt.label}</span>
+                    <span className="text-sm text-[var(--eh-ink)]">{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -287,7 +287,7 @@ export default function Onboarding() {
                 ].map(opt => (
                   <label key={opt.id} className="flex items-center space-x-3 p-3 bg-[var(--eh-canvas)] rounded-lg cursor-pointer">
                     <input type="checkbox" checked={supportPref.includes(opt.id)} onChange={() => toggleArray(supportPref, setSupportPref, opt.id, undefined, ['private', 'unknown'])} />
-                    <span className="text-sm">{opt.label}</span>
+                    <span className="text-sm text-[var(--eh-ink)]">{opt.label}</span>
                   </label>
                 ))}
               </div>

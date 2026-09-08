@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { actionLibrary } from '@/lib/action-library';
 import { DownloadPlanButton } from '@/components/PlanPDF';
 import { EvidenceDrawer } from '@/components/EvidenceDrawer';
-import { InstallPrompt } from '@/components/InstallPrompt';
 
 export default function Today() {
   const { profile, dailyPlans, generateDailyPlan, saveDailyPlan, resetDemo } = useAppStore();
@@ -176,7 +175,7 @@ export default function Today() {
         <p className="text-[var(--eh-lilac)] text-sm">Review your suggested actions or ask for an alternative.</p>
       </div>
 
-      <InstallPrompt />
+
 
       <div className="space-y-6">
         {plan.actions.map((action, idx) => (
