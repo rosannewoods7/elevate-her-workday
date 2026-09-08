@@ -217,18 +217,39 @@ export function SupportPDFDownload({ type, workData, healthData, disabled }: { t
 
   return (
     <BlobProvider document={doc}>
-      {({ url, loading }) =>
-        loading || !url ? (
+      {({ blob, url, loading }) =>
+        loading || !blob || !url ? (
           <button className="w-full py-4 bg-[var(--eh-lilac)] text-[var(--eh-mauve)] font-bold rounded-[var(--eh-control-radius)]">Generating PDF...</button>
         ) : (
-          <a 
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-            className="w-full block text-center py-4 bg-[var(--eh-plum)] text-white font-bold rounded-[var(--eh-control-radius)] shadow-[var(--eh-shadow)] hover:opacity-90 transition-all"
+          <button 
+            onClick={async () => {
+              const fileName = `${type === 'work' ? 'Work_Adjustment_Request' : 'Healthcare_Preparation'}.pdf`;
+              if (navigator.share && navigator.canShare) {
+                const file = new File([blob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                  try {
+                    await navigator.share({
+                      files: [file],
+                      title: fileName.replace('.pdf', ''),
+                    });
+                    return;
+                  } catch (err) {
+                    console.log('Share canceled or failed');
+                  }
+                }
+              }
+              // Fallback for desktop/non-share browsers
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }}
+            className="w-full py-4 bg-[var(--eh-plum)] text-white font-bold rounded-[var(--eh-control-radius)] shadow-[var(--eh-shadow)] hover:opacity-90 transition-all"
           >
-            Open Preparation PDF
-          </a>
+            Share / Save PDF
+          </button>
         )
       }
     </BlobProvider>

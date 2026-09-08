@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, BlobProvider } from '@react-pdf/renderer';
 import { DailyPlan, Profile } from '@/lib/types';
 
 const styles = StyleSheet.create({
@@ -139,16 +139,42 @@ export function DownloadPlanButton({ plan, profile }: PlanPDFProps) {
   if (!isClient) return <button className="w-full py-3 border border-[var(--primary)] text-[var(--primary)] font-semibold rounded-lg opacity-50">Preparing PDF...</button>;
 
   return (
-    <PDFDownloadLink document={<PlanDocument plan={plan} profile={profile} />} fileName={`Workday_Plan_${plan.local_date}.pdf`}>
-      {({ blob, url, loading, error }) =>
-        loading ? (
-          <button className="w-full py-3 border border-[var(--primary)] text-[var(--primary)] font-semibold rounded-lg opacity-50">Loading PDF...</button>
+    <BlobProvider document={<PlanDocument plan={plan} profile={profile} />}>
+      {({ blob, url, loading }) =>
+        loading || !blob || !url ? (
+          <button className="w-full py-3 border border-[var(--primary)] text-[var(--primary)] font-semibold rounded-[var(--eh-control-radius)] opacity-50">Loading PDF...</button>
         ) : (
-          <button className="w-full py-3 border border-[var(--primary)] text-[var(--primary)] font-semibold rounded-lg hover:bg-[#e8dde5]">
-            Download my summary
+          <button 
+            onClick={async () => {
+              const fileName = `Workday_Plan_${plan.local_date}.pdf`;
+              if (navigator.share && navigator.canShare) {
+                const file = new File([blob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                  try {
+                    await navigator.share({
+                      files: [file],
+                      title: 'Workday Plan',
+                    });
+                    return;
+                  } catch (err) {
+                    console.log('Share canceled or failed');
+                  }
+                }
+              }
+              // Fallback for desktop/non-share browsers
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }}
+            className="w-full py-3 border border-[var(--primary)] text-[var(--primary)] font-semibold rounded-[var(--eh-control-radius)] hover:bg-[#e8dde5]"
+          >
+            Share / Save my summary
           </button>
         )
       }
-    </PDFDownloadLink>
+    </BlobProvider>
   );
 }
