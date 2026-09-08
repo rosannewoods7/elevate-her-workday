@@ -17,16 +17,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const isAuthRoute = pathname === '/login' || pathname === '/register';
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        
+        const isAuthRoute = pathname === '/login' || pathname === '/register';
 
-      if (!session && !isAuthRoute) {
-        router.push('/login');
-      } else if (session && isAuthRoute) {
-        router.push('/today');
+        if (!session && !isAuthRoute) {
+          router.push('/login');
+        } else if (session && isAuthRoute) {
+          router.push('/today');
+        }
+      } catch (err) {
+        console.error('Supabase session error:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkSession();

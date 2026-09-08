@@ -153,8 +153,8 @@ export default function Onboarding() {
                   { id: 'comfort', label: 'Physical comfort/temperature changes' },
                   { id: 'support', label: 'Difficulty asking for support' },
                 ].map(domain => (
-                  <div key={domain.id} className="flex justify-between items-center bg-[var(--eh-canvas)] p-3 rounded-lg">
-                    <span className="text-sm font-medium">{domain.label}</span>
+                  <div key={domain.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-[var(--eh-canvas)] p-3 rounded-lg gap-3">
+                    <span className="text-sm font-medium text-[var(--eh-ink)]">{domain.label}</span>
                     <div className="flex gap-2">
                       {[0, 1, 2, 3].map(val => (
                         <button 
@@ -300,12 +300,12 @@ export default function Onboarding() {
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
                   <button 
                     key={day} onClick={() => toggleArray(schedule, setSchedule, day, undefined, ['variable'])}
-                    className={`p-2 text-xs rounded-lg border text-center ${schedule.includes(day) ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] border-[var(--eh-line)]'}`}
+                    className={`p-2 text-xs rounded-lg border text-center ${schedule.includes(day) ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
                   >{day}</button>
                 ))}
                 <button 
                   onClick={() => setSchedule(['variable'])}
-                  className={`p-2 text-xs rounded-lg border text-center ${schedule.includes('variable') ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] border-[var(--eh-line)]'}`}
+                  className={`p-2 text-xs rounded-lg border text-center ${schedule.includes('variable') ? 'bg-[var(--eh-plum)] text-white border-[var(--eh-plum)]' : 'bg-[var(--eh-canvas)] text-[var(--eh-ink)] border-[var(--eh-line)]'}`}
                 >Variable</button>
               </div>
             </div>

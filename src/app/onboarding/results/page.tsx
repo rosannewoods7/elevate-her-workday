@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { Domain } from '@/lib/types';
@@ -19,7 +19,13 @@ export default function Results() {
   const router = useRouter();
   const { profile, updateProfile } = useAppStore();
   const [isEditingPriority, setIsEditingPriority] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
   if (!profile) return null;
 
   const handleContinue = () => {

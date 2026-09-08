@@ -5,20 +5,26 @@ import { usePathname, useRouter } from 'next/navigation';
 import { CheckCircle, Calendar, LineChart, MessageCircle, BookOpen, ClipboardEdit } from 'lucide-react';
 
 import { useAppStore } from '@/lib/store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { InstallPrompt } from '@/components/InstallPrompt';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { profile } = useAppStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!profile) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !profile) {
       router.push('/onboarding');
     }
-  }, [profile, router]);
+  }, [profile, router, mounted]);
 
+  if (!mounted) return null;
   if (!profile) return null;
 
   return (
