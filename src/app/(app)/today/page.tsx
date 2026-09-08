@@ -33,9 +33,10 @@ export default function Today() {
 
   if (!localDate) return null;
 
-  const handleShowPlan = () => {
+  const handleShowPlan = (approach?: any, overrideFocus?: string) => {
     if (!plan) {
-      const newPlan = generateDailyPlan(localDate, concern !== 'general' ? concern || undefined : undefined);
+      const explicitFocus = (overrideFocus as any) || (concern !== 'general' ? concern || undefined : undefined);
+      const newPlan = generateDailyPlan(localDate, explicitFocus, undefined, undefined, approach);
       saveDailyPlan(newPlan);
     }
     setShowCheckIn(false);
@@ -119,6 +120,15 @@ export default function Today() {
   }
 
   if (showCheckIn) {
+    if (profile?.offer_daily_check !== false) {
+      return (
+        <DailyCapacityCheck 
+          onComplete={(approach, focus) => handleShowPlan(approach, focus)}
+          onSkip={() => handleShowPlan('usual')}
+        />
+      );
+    }
+
     return (
       <div className="p-6 max-w-md mx-auto space-y-6 font-sans pb-32">
         <h1 className="text-2xl font-serif font-bold text-[var(--eh-lilac)]">What Would Help Today?</h1>
@@ -143,40 +153,13 @@ export default function Today() {
               ))}
             </div>
           </div>
-
-          {concern && concern !== 'general' && (
-            <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-              <label className="block text-sm font-bold text-white mb-2">2. How much is this getting in the way today?</label>
-              <select className="w-full p-4 rounded-[var(--eh-control-radius)] bg-white text-[var(--eh-ink)] shadow-[var(--eh-shadow)] border-none">
-                <option value="">Select severity...</option>
-                <option value="0">0 - Not at all</option>
-                <option value="1">1 - A little</option>
-                <option value="2">2 - Moderately</option>
-                <option value="3">3 - A lot</option>
-              </select>
-            </div>
-          )}
-
-          <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-            <label className="block text-sm font-bold text-white mb-2">3. Anything you want to prepare for?</label>
-            <select className="w-full p-4 rounded-[var(--eh-control-radius)] bg-white text-[var(--eh-ink)] shadow-[var(--eh-shadow)] border-none">
-              <option value="">Select an upcoming demand (optional)...</option>
-              <option value="meetings">Meetings</option>
-              <option value="deadlines">Deadlines</option>
-              <option value="public_facing">Public-facing tasks</option>
-              <option value="interruptions">Interruptions</option>
-              <option value="unpredictable">Unpredictable work</option>
-              <option value="none">None</option>
-            </select>
-          </div>
+          <button 
+            onClick={() => handleShowPlan('usual')}
+            className="w-full bg-[var(--eh-plum)] text-white font-bold py-3 px-4 rounded-[var(--eh-control-radius)] hover:bg-[#3a103b] transition-colors"
+          >
+            Show my plan
+          </button>
         </div>
-
-        <button onClick={handleShowPlan} className="w-full py-4 bg-[var(--eh-plum)] text-white font-bold rounded-[var(--eh-control-radius)] shadow-[var(--eh-shadow)] hover:opacity-90 transition-opacity text-lg mt-6">
-          Show My Plan
-        </button>
-        <button onClick={handleShowPlan} className="w-full py-4 text-white font-bold hover:text-[var(--eh-lilac)] transition-colors">
-          Use My Saved Plan
-        </button>
       </div>
     );
   }
