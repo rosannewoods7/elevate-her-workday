@@ -888,8 +888,8 @@ export const actionLibrary: ActionContent[] = [
   {
     "id": "L09",
     "domain": "load",
-    "title": "Agree an interruption rule",
-    "instruction": "Propose a clear distinction between urgent interruptions and items that can wait for a check-in. Agree it with the relevant people.",
+    "title": "Set a clear boundary for interruptions (e.g., headphones on)",
+    "instruction": "Agree with your team on a visible signal (like headphones, or 'do not disturb' status) that means you are doing deep work and should only be interrupted for emergencies.",
     "fallback": "If the rule cannot change, I’ll prepare a return note for my own task.",
     "setup_seconds": 60,
     "use_seconds": 60,
