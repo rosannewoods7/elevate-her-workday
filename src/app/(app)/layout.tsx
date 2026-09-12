@@ -66,15 +66,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <DiscreetProvider>
       <div className="flex flex-col h-screen bg-[var(--background)]">
         <div className="sticky top-0 z-20 bg-[var(--eh-paper)] shadow-sm border-b border-[var(--eh-line)]">
-          <header className="p-4 flex items-center justify-between border-b border-gray-100">
-            <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Elevate HER" className="h-8 w-auto object-contain" />
-              <h1 className="font-serif font-bold text-lg text-[var(--eh-plum)]">Elevate HER Workday</h1>
+          <header className="px-3 py-2 flex items-center justify-between border-b border-[var(--eh-line)]">
+            <div className="flex items-center gap-2 min-w-0">
+              <img src="/logo.png" alt="Elevate HER" className="h-6 w-auto object-contain shrink-0" />
+              <h1 className="font-serif font-bold text-base sm:text-lg text-[var(--eh-plum)] truncate">Elevate HER Workday</h1>
             </div>
-            <HeaderControls />
+            <div className="shrink-0 pl-2">
+              <HeaderControls />
+            </div>
           </header>
 
-        <nav className="w-full flex justify-around items-center h-16 px-1">
+        <nav className="w-full flex justify-around items-center h-14 px-1">
           {[
             { href: '/today', label: 'Today', icon: <CheckCircle size={18} /> },
             { href: '/planner', label: '30 Days', icon: <Calendar size={18} /> },
