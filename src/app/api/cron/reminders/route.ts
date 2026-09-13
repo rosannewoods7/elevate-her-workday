@@ -43,7 +43,7 @@ export async function GET(req: Request) {
       };
       
       try {
-        await webpush.sendNotification(pushSubscription, payload);
+        await webpush.sendNotification(pushSubscription, payload, { urgency: 'high' });
         sentCount++;
       } catch (err: any) {
         if (err.statusCode === 410 || err.statusCode === 404) {

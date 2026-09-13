@@ -30,7 +30,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: 'No subscriptions found' });
     }
 
-    // Wait on the backend if requested
     if (delay) {
        await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -50,7 +49,10 @@ export async function POST(req: Request) {
       };
       
       try {
-        await webpush.sendNotification(pushSubscription, payload);
+        // High urgency is required on iOS to guarantee a visible banner and immediate delivery
+        await webpush.sendNotification(pushSubscription, payload, {
+          urgency: 'high'
+        });
         sentCount++;
       } catch (err: any) {
         lastError = err;
