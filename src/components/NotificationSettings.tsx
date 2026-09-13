@@ -113,19 +113,14 @@ export function NotificationSettings() {
 
         const subJson = subscription.toJSON();
         
-        const res = await fetch('/api/push/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            account_id: session.user.id,
-            subscription: subJson
-          })
-        });
+        const { error: dbError } = await supabase.from('push_subscriptions').upsert({
+          account_id: session.user.id,
+          endpoint: subJson.endpoint,
+          p256dh: subJson.keys?.p256dh,
+          auth: subJson.keys?.auth
+        }, { onConflict: 'endpoint' });
 
-        if (!res.ok) {
-           const errTxt = await res.text();
-           throw new Error("Database error: " + errTxt);
-        }
+        if (dbError) throw new Error("Database error: " + dbError.message);
         
         setIsSubscribed(true);
       }
