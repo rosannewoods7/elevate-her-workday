@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Bell, BellOff, Loader2, Send } from 'lucide-react';
+import { Bell, BellOff, Loader2, Send, Smartphone } from 'lucide-react';
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
@@ -125,15 +125,13 @@ export function NotificationSettings() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) throw new Error("Not logged in");
 
-      // We fire the fetch immediately, but instruct the Vercel backend to wait 5 seconds!
-      // This prevents iOS from freezing the Javascript execution when you swipe up!
       const res = await fetch('/api/push/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           account_id: session.user.id,
           title: "Elevate HER Workday",
-          message: "It works! Your phone is receiving background nudges.",
+          message: "Remote Cloud Push: It works from the cloud!",
           url: "/today",
           delay: 5000
         })
@@ -148,6 +146,25 @@ export function NotificationSettings() {
       setError(err.message || "Test push failed");
     } finally {
       setIsTesting(false);
+    }
+  };
+
+  const testLocalPush = async () => {
+    setError(null);
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration) {
+        // Wait 3 seconds, then show a local notification
+        setTimeout(() => {
+          registration.showNotification("Elevate HER Workday", {
+            body: "Local Test: Your phone supports notifications!",
+          });
+        }, 3000);
+      } else {
+        throw new Error("No active service worker found.");
+      }
+    } catch (err: any) {
+      setError(err.message || "Local push failed");
     }
   };
 
@@ -168,14 +185,23 @@ export function NotificationSettings() {
         
         <div className="flex items-center gap-2">
           {isSubscribed && (
-            <button
-              onClick={testPush}
-              disabled={isTesting}
-              className="p-2 rounded font-bold text-sm transition-colors text-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]"
-              title="Send Test Push"
-            >
-              {isTesting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-            </button>
+            <>
+              <button
+                onClick={testLocalPush}
+                className="p-2 rounded font-bold text-sm transition-colors text-blue-500 hover:bg-[var(--eh-canvas)]"
+                title="Test Local Notification (Phone Only)"
+              >
+                <Smartphone size={16} />
+              </button>
+              <button
+                onClick={testPush}
+                disabled={isTesting}
+                className="p-2 rounded font-bold text-sm transition-colors text-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]"
+                title="Test Cloud Push (Vercel Server)"
+              >
+                {isTesting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              </button>
+            </>
           )}
 
           <button
@@ -187,7 +213,7 @@ export function NotificationSettings() {
           </button>
         </div>
       </div>
-      {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+      {error && <p className="text-red-500 text-xs mt-2 break-words">{error}</p>}
     </div>
   );
 }
