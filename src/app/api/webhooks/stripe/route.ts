@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Stripe (use the Secret Key)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2026-08-26.dahlia',
 });
 
 // Initialize Supabase with the Service Role Key to bypass RLS and update the user's profile
