@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     webpush.setVapidDetails(
-      'mailto:support@elevateherworkday.com',
+      'https://elevateherworkday.vercel.app',
       process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
       process.env.VAPID_PRIVATE_KEY || ''
     );

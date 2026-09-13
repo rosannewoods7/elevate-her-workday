@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     webpush.setVapidDetails(
-      'mailto:support@elevateherworkday.com',
+      'https://elevateherworkday.vercel.app',
       (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'placeholder') as string,
       (process.env.VAPID_PRIVATE_KEY || 'placeholder') as string
     );
@@ -49,7 +49,6 @@ export async function POST(req: Request) {
       };
       
       try {
-        // High urgency is required on iOS to guarantee a visible banner and immediate delivery
         await webpush.sendNotification(pushSubscription, payload, {
           urgency: 'high'
         });
