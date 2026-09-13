@@ -71,14 +71,20 @@ export function NotificationSettings() {
          throw new Error("Could not register service worker. Try completely restarting the app.");
       }
 
-      // If the worker is installing/waiting but not active yet, wait for it
       if (!registration.active) {
         registration = await navigator.serviceWorker.ready;
       }
 
       if (isSubscribed) {
         const subscription = await registration.pushManager.getSubscription();
-        if (subscription) await subscription.unsubscribe();
+        if (subscription) {
+          await subscription.unsubscribe();
+          // Remove from DB
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user?.id) {
+            await supabase.from('push_subscriptions').delete().eq('endpoint', subscription.endpoint);
+          }
+        }
         setIsSubscribed(false);
       } else {
         const { data: { session } } = await supabase.auth.getSession();
@@ -91,19 +97,17 @@ export function NotificationSettings() {
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
         });
 
-        const res = await fetch('/api/push/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            subscription,
-            account_id: session.user.id
-          })
-        });
+        const subJson = subscription.toJSON();
+        
+        // Insert directly using the client's authenticated Supabase session
+        const { error: dbError } = await supabase.from('push_subscriptions').upsert({
+          account_id: session.user.id,
+          endpoint: subJson.endpoint,
+          p256dh: subJson.keys?.p256dh,
+          auth: subJson.keys?.auth
+        }, { onConflict: 'endpoint' });
 
-        if (!res.ok) {
-           const errText = await res.text();
-           throw new Error("Server error: " + errText);
-        }
+        if (dbError) throw new Error("Database error: " + dbError.message);
         
         setIsSubscribed(true);
       }
