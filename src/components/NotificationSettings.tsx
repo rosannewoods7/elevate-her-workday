@@ -148,7 +148,10 @@ export function NotificationSettings() {
 
       const res = await fetch('/api/push/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({
           account_id: session.user.id,
           title: "Elevate HER Workday",

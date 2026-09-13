@@ -5,8 +5,15 @@ import webpush from 'web-push';
 export async function POST(req: Request) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-    const supabaseServiceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder') as string;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder') as string;
+    
+    // Extract JWT from Authorization header
+    const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+    
+    // Create client authenticated as the user who sent the request
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } }
+    });
 
     webpush.setVapidDetails(
       'mailto:support@elevate-her-workday.com',
