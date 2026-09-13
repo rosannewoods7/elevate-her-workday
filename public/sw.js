@@ -7,21 +7,29 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('push', function (event) {
-  if (!event.data) return;
+  let title = 'Elevate HER Workday';
+  let message = 'You have a new reminder.';
+  let url = '/today';
 
-  try {
-    const data = JSON.parse(event.data.text());
-    event.waitUntil(
-      self.registration.showNotification(data.title || 'Elevate HER Workday', {
-        body: data.message || 'You have a new reminder.',
-        data: {
-          url: data.url || '/today',
-        },
-      })
-    );
-  } catch (err) {
-    console.error('Error parsing push data', err);
+  if (event.data) {
+    try {
+      const data = JSON.parse(event.data.text());
+      title = data.title || title;
+      message = data.message || message;
+      url = data.url || url;
+    } catch (err) {
+      console.error('Error parsing push data', err);
+      // Fallback to text if not JSON
+      message = event.data.text() || message;
+    }
   }
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: message,
+      data: { url: url }
+    })
+  );
 });
 
 self.addEventListener('notificationclick', function (event) {
