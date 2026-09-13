@@ -125,9 +125,8 @@ export function NotificationSettings() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) throw new Error("Not logged in");
 
-      // Wait 5 seconds so the user can background the app
-      await new Promise(resolve => setTimeout(resolve, 5000));
-
+      // We fire the fetch immediately, but instruct the Vercel backend to wait 5 seconds!
+      // This prevents iOS from freezing the Javascript execution when you swipe up!
       const res = await fetch('/api/push/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,7 +134,8 @@ export function NotificationSettings() {
           account_id: session.user.id,
           title: "Elevate HER Workday",
           message: "It works! Your phone is receiving background nudges.",
-          url: "/today"
+          url: "/today",
+          delay: 5000
         })
       });
 

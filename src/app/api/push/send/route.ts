@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       (process.env.VAPID_PRIVATE_KEY || 'placeholder') as string
     );
 
-    const { account_id, title, message, url } = await req.json();
+    const { account_id, title, message, url, delay } = await req.json();
 
     if (!account_id) {
       return NextResponse.json({ error: 'Missing account_id' }, { status: 400 });
@@ -28,6 +28,11 @@ export async function POST(req: Request) {
     if (error) throw error;
     if (!subs || subs.length === 0) {
       return NextResponse.json({ success: true, message: 'No subscriptions found' });
+    }
+
+    // Wait on the backend if requested
+    if (delay) {
+       await new Promise(resolve => setTimeout(resolve, delay));
     }
 
     const payload = JSON.stringify({ title, message, url });
