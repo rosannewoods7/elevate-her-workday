@@ -9,21 +9,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('push', function (event) {
-  if (!event.data) return;
-
-  try {
-    const data = JSON.parse(event.data.text());
-    event.waitUntil(
-      self.registration.showNotification(data.title || 'Elevate HER Workday', {
-        body: data.message || 'You have a new reminder.',
-        data: {
-          url: data.url || '/today',
-        },
-      })
-    );
-  } catch (err) {
-    console.error('Error parsing push data', err);
-  }
+  event.waitUntil(
+    self.registration.showNotification('Elevate HER Workday', {
+      body: 'Cloud Push Received!',
+      data: { url: '/today' }
+    })
+  );
 });
 
 self.addEventListener('notificationclick', function (event) {
