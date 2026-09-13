@@ -83,7 +83,7 @@ export function NotificationSettings() {
 
       let registration = await navigator.serviceWorker.getRegistration();
       if (!registration) {
-         registration = await navigator.serviceWorker.register('/sw.js');
+         registration = await navigator.serviceWorker.register('/sw.js?v=' + Date.now());
       }
 
       if (!registration) {
@@ -93,6 +93,9 @@ export function NotificationSettings() {
       if (!registration.active) {
         registration = await navigator.serviceWorker.ready;
       }
+
+      // Explicitly forcefully update the background worker to absolutely guarantee it's running the latest code
+      try { await registration.update(); } catch (e) {}
 
       if (isSubscribed) {
         const subscription = await registration.pushManager.getSubscription();
