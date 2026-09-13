@@ -211,34 +211,6 @@ export function NotificationSettings() {
         
         <div className="flex items-center gap-2">
           <button
-            onClick={resetWorker}
-            className="p-2 rounded font-bold text-sm transition-colors text-[var(--eh-muted)] hover:bg-[var(--eh-canvas)]"
-            title="Reset Connection"
-          >
-            <RefreshCw size={16} />
-          </button>
-
-          {isSubscribed && (
-            <>
-              <button
-                onClick={testLocalPush}
-                className="p-2 rounded font-bold text-sm transition-colors text-blue-500 hover:bg-[var(--eh-canvas)]"
-                title="Test Local Notification (Phone Only)"
-              >
-                <Smartphone size={16} />
-              </button>
-              <button
-                onClick={testPush}
-                disabled={isTesting}
-                className="p-2 rounded font-bold text-sm transition-colors text-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]"
-                title="Test Cloud Push (Vercel Server)"
-              >
-                {isTesting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-              </button>
-            </>
-          )}
-
-          <button
             onClick={toggleSubscription}
             disabled={isLoading}
             className={"px-4 py-2 rounded font-bold text-sm transition-colors " + (isSubscribed ? "bg-[var(--eh-line)] text-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]" : "bg-[var(--eh-plum)] text-white hover:opacity-90")}
