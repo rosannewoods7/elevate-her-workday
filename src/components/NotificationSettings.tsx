@@ -40,6 +40,10 @@ export function NotificationSettings() {
     try {
       const registrations = await navigator.serviceWorker.getRegistrations();
       for (const registration of registrations) {
+        const sub = await registration.pushManager.getSubscription();
+        if (sub) {
+          await sub.unsubscribe();
+        }
         await registration.unregister();
       }
       window.location.reload();
