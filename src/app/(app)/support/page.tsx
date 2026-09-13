@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ChevronLeft } from 'lucide-react';
+import { NotificationSettings } from '@/components/NotificationSettings';
 
 const SupportPDFDownload = dynamic(
   () => import('@/components/SupportPDF').then(m => m.SupportPDFDownload),
@@ -48,6 +49,8 @@ export default function SupportPage() {
             <p className="text-[var(--eh-muted)] text-sm mt-2 mb-4 leading-relaxed">Leave with a clearer next step. Bring a concise account of what has changed.</p>
             <span className="inline-block bg-[var(--eh-plum)] text-white text-sm font-bold py-2 px-4 rounded-[var(--eh-control-radius)] group-hover:opacity-90">Start Health Builder</span>
           </button>
+
+          <NotificationSettings />
         </div>
       </main>
     );
