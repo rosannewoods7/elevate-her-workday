@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     webpush.setVapidDetails(
-      'https://elevateherworkday.vercel.app',
+      'mailto:support@elevate-her-workday.com',
       (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'placeholder') as string,
       (process.env.VAPID_PRIVATE_KEY || 'placeholder') as string
     );
