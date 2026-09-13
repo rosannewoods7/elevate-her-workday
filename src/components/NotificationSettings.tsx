@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Bell, BellOff, Loader2, Send, Smartphone } from 'lucide-react';
+import { Bell, BellOff, Loader2, Send, Smartphone, RefreshCw } from 'lucide-react';
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
@@ -31,6 +31,20 @@ export function NotificationSettings() {
     } catch (err) {
       console.error('Service worker error:', err);
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetWorker = async () => {
+    setIsLoading(true);
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        await registration.unregister();
+      }
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
       setIsLoading(false);
     }
   };
@@ -184,6 +198,14 @@ export function NotificationSettings() {
         </div>
         
         <div className="flex items-center gap-2">
+          <button
+            onClick={resetWorker}
+            className="p-2 rounded font-bold text-sm transition-colors text-[var(--eh-muted)] hover:bg-[var(--eh-canvas)]"
+            title="Reset Connection"
+          >
+            <RefreshCw size={16} />
+          </button>
+
           {isSubscribed && (
             <>
               <button
