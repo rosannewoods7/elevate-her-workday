@@ -22,11 +22,13 @@ export function NotificationSettings() {
 
   const checkSubscription = async () => {
     try {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      setIsSubscribed(!!subscription);
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration) {
+        const subscription = await registration.pushManager.getSubscription();
+        setIsSubscribed(!!subscription);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Service worker error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -51,7 +53,15 @@ export function NotificationSettings() {
     setIsLoading(true);
     setError(null);
     try {
-      const registration = await navigator.serviceWorker.ready;
+      let registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) {
+        // Fallback wait if it was just installed
+        registration = await navigator.serviceWorker.ready;
+      }
+
+      if (!registration) {
+         throw new Error("Service Worker is not active. Try reloading the app.");
+      }
 
       if (isSubscribed) {
         const subscription = await registration.pushManager.getSubscription();
@@ -61,7 +71,7 @@ export function NotificationSettings() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id) throw new Error("Please log in first.");
 
-        if (!VAPID_PUBLIC_KEY) throw new Error("Push notifications not configured on the server.");
+        if (!VAPID_PUBLIC_KEY) throw new Error("Push notifications not configured. Please add VAPID keys to Vercel and redeploy.");
 
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
