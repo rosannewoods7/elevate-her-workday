@@ -2,19 +2,18 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Stripe (use the Secret Key)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-08-26.dahlia',
-});
-
-// Initialize Supabase with the Service Role Key to bypass RLS and update the user's profile
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-);
-
 export async function POST(req: Request) {
   try {
+    // Initialize Stripe inside the handler to prevent build-time crashes if env var is missing
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'dummy', {
+      apiVersion: '2026-08-26.dahlia',
+    });
+
+    // Initialize Supabase Admin inside the handler to prevent build-time crashes if URL is missing
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://dummy.url',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy-key'
+    );
     const body = await req.text();
     const sig = req.headers.get('stripe-signature');
 
