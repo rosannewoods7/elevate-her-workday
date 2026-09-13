@@ -33,7 +33,8 @@ export async function POST(req: Request) {
     const payload = JSON.stringify({ title, message, url });
     
     let sentCount = 0;
-    let lastError = null;
+    let lastError: any = null;
+    let resLogs: string[] = [];
 
     const promises = subs.map(async (sub) => {
       const pushSubscription = {
@@ -44,30 +45,36 @@ export async function POST(req: Request) {
         }
       };
       
+      let resLog = 'Unknown';
       try {
-        await webpush.sendNotification(pushSubscription, payload, {
+        const pushRes = await webpush.sendNotification(pushSubscription, payload, {
           urgency: 'high',
           TTL: 60
         });
+        resLog = pushRes.statusCode + " " + pushRes.body;
         sentCount++;
       } catch (err: any) {
         lastError = err;
+        resLog = err.statusCode + " " + err.body + " " + err.message;
         if (err.statusCode === 410 || err.statusCode === 404) {
           await supabase.from('push_subscriptions').delete().eq('id', sub.id);
         } else {
           console.error("Web Push Error:", err);
-          throw new Error(`Web Push Error: ${err.statusCode} - ${err.body}`);
         }
       }
+      
+      // LOG TO CONSOLE SO I CAN VIEW IT
+      console.log(`[PUSH_TRACE] endpoint=${sub.endpoint.substring(0,30)}... res=${resLog}`);
+      resLogs.push(resLog);
     });
 
     await Promise.all(promises);
 
     if (sentCount === 0 && lastError) {
-       throw lastError;
+      throw lastError;
     }
 
-    return NextResponse.json({ success: true, sentTo: sentCount });
+    return NextResponse.json({ success: true, sentTo: sentCount, diagnostic: resLogs.join(" | ") });
   } catch (error: any) {
     console.error('Push send error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
