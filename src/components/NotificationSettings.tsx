@@ -125,13 +125,16 @@ export function NotificationSettings() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) throw new Error("Not logged in");
 
+      // Wait 5 seconds so the user can background the app
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
       const res = await fetch('/api/push/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           account_id: session.user.id,
-          title: "It works!",
-          message: "Your phone is now successfully connected to Elevate HER Workday.",
+          title: "Elevate HER Workday",
+          message: "It works! Your phone is receiving background nudges.",
           url: "/today"
         })
       });
