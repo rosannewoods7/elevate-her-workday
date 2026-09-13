@@ -30,10 +30,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: 'No subscriptions found' });
     }
 
-    if (delay) {
-       await new Promise(resolve => setTimeout(resolve, delay));
-    }
-
     const payload = JSON.stringify({ title, message, url });
     
     let sentCount = 0;

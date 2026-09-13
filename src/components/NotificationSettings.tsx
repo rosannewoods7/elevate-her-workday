@@ -146,8 +146,7 @@ export function NotificationSettings() {
           account_id: session.user.id,
           title: "Elevate HER Workday",
           message: "Remote Cloud Push: It works from the cloud!",
-          url: "/today",
-          delay: 5000
+          url: "/today"
         })
       });
 
@@ -155,6 +154,8 @@ export function NotificationSettings() {
         const txt = await res.text();
         throw new Error("Failed to send test push: " + txt);
       }
+      const data = await res.json();
+      alert("Vercel sent the push to " + data.sentTo + " device(s)!");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Test push failed");
