@@ -16,8 +16,6 @@ self.addEventListener('push', function (event) {
     event.waitUntil(
       self.registration.showNotification(data.title || 'Elevate HER Workday', {
         body: data.message || 'You have a new reminder.',
-        icon: '/logo.png',
-        badge: '/logo.png',
         vibrate: [100, 50, 100],
         data: {
           url: data.url || '/today',
