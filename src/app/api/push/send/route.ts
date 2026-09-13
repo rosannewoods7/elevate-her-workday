@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     if (error) throw error;
     if (!subs || subs.length === 0) {
-      return NextResponse.json({ success: true, message: 'No subscriptions found' });
+      return NextResponse.json({ error: 'No subscriptions found in the database for your account. Please tap Disable, then Enable again.' }, { status: 400 });
     }
 
     const payload = JSON.stringify({ title, message, url });
