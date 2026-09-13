@@ -21,8 +21,13 @@ export default function Today() {
   }, []);
 
   const plan = dailyPlans[localDate];
+  const [showCheckIn, setShowCheckIn] = useState(true);
   
-  const [showCheckIn, setShowCheckIn] = useState(!plan);
+  useEffect(() => {
+    if (localDate) {
+      setShowCheckIn(!dailyPlans[localDate]);
+    }
+  }, [localDate, dailyPlans]);
   const [concern, setConcern] = useState<Domain | 'general' | null>(null);
   
   const [dayChanged, setDayChanged] = useState(false);
