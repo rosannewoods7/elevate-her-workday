@@ -53,16 +53,27 @@ export function NotificationSettings() {
     setIsLoading(true);
     setError(null);
     try {
+      if (!('Notification' in window)) {
+        throw new Error("This browser does not support notifications.");
+      }
+
+      // 1. Explicitly request permission first (Required for iOS Web Push)
+      const permission = await window.Notification.requestPermission();
+      if (permission !== 'granted') {
+        throw new Error("Notification permission denied. Please enable them in your device settings.");
+      }
+
+      // 2. Ensure Service Worker is registered
       let registration = await navigator.serviceWorker.getRegistration();
       if (!registration) {
-        // Fallback wait if it was just installed
-        registration = await navigator.serviceWorker.ready;
+         registration = await navigator.serviceWorker.register('/sw.js');
       }
 
       if (!registration) {
-         throw new Error("Service Worker is not active. Try reloading the app.");
+         throw new Error("Could not register service worker. Try completely restarting the app.");
       }
 
+      // 3. Handle Subscription logic
       if (isSubscribed) {
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) await subscription.unsubscribe();
@@ -71,7 +82,7 @@ export function NotificationSettings() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id) throw new Error("Please log in first.");
 
-        if (!VAPID_PUBLIC_KEY) throw new Error("Push notifications not configured. Please add VAPID keys to Vercel and redeploy.");
+        if (!VAPID_PUBLIC_KEY) throw new Error("Server missing VAPID keys. Ensure they are in Vercel.");
 
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
@@ -87,7 +98,10 @@ export function NotificationSettings() {
           })
         });
 
-        if (!res.ok) throw new Error("Failed to save subscription to server.");
+        if (!res.ok) {
+           const errText = await res.text();
+           throw new Error("Server error: " + errText);
+        }
         
         setIsSubscribed(true);
       }
