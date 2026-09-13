@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       } catch (err: any) {
         lastError = err;
         resLog = err.statusCode + " " + err.body + " " + err.message;
-        if (err.statusCode === 410 || err.statusCode === 404) {
+        if (err.statusCode === 410 || err.statusCode === 404 || err.statusCode === 400) {
           await supabase.from('push_subscriptions').delete().eq('id', sub.id);
         } else {
           console.error("Web Push Error:", err);

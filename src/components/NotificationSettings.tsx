@@ -165,7 +165,8 @@ export function NotificationSettings() {
         throw new Error("Failed to send test push: " + txt);
       }
       const data = await res.json();
-      alert(`Vercel sent the push to ${data.sentTo} device(s)! DIAGNOSTIC: ${data.diagnostic}`);
+      console.log(`Vercel sent the push to ${data.sentTo} device(s)! DIAGNOSTIC: ${data.diagnostic}`);
+      // Just a clean notification or silent success
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Test push failed");
