@@ -45,8 +45,10 @@ export async function POST(req: Request) {
       };
       
       try {
-        await webpush.sendNotification(pushSubscription, payload, {
-          urgency: 'high'
+        // Send with NO payload to test if encryption is the reason Apple is dropping it
+        await webpush.sendNotification(pushSubscription, Buffer.from(''), {
+          urgency: 'high',
+          TTL: 60
         });
         sentCount++;
       } catch (err: any) {
