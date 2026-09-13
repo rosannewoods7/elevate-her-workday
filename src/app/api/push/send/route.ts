@@ -31,6 +31,10 @@ export async function POST(req: Request) {
     }
 
     const payload = JSON.stringify({ title, message, url });
+    
+    let sentCount = 0;
+    let lastError = null;
+
     const promises = subs.map(async (sub) => {
       const pushSubscription = {
         endpoint: sub.endpoint,
@@ -42,18 +46,27 @@ export async function POST(req: Request) {
       
       try {
         await webpush.sendNotification(pushSubscription, payload);
+        sentCount++;
       } catch (err: any) {
+        lastError = err;
         if (err.statusCode === 410 || err.statusCode === 404) {
           await supabase.from('push_subscriptions').delete().eq('id', sub.id);
+        } else {
+          console.error("Web Push Error:", err);
+          throw new Error(`Web Push Error: ${err.statusCode} - ${err.body}`);
         }
       }
     });
 
     await Promise.all(promises);
 
-    return NextResponse.json({ success: true, sentTo: subs.length });
-  } catch (error) {
+    if (sentCount === 0 && lastError) {
+       throw lastError;
+    }
+
+    return NextResponse.json({ success: true, sentTo: sentCount });
+  } catch (error: any) {
     console.error('Push send error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }

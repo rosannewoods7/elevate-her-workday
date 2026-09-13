@@ -19,7 +19,6 @@ export async function GET(req: Request) {
       process.env.VAPID_PRIVATE_KEY || ''
     );
 
-    // Fetch all active push subscriptions
     const { data: subs, error } = await supabase.from('push_subscriptions').select('*');
 
     if (error) throw error;
@@ -33,6 +32,7 @@ export async function GET(req: Request) {
       url: '/today' 
     });
 
+    let sentCount = 0;
     const promises = subs.map(async (sub) => {
       const pushSubscription = {
         endpoint: sub.endpoint,
@@ -44,18 +44,21 @@ export async function GET(req: Request) {
       
       try {
         await webpush.sendNotification(pushSubscription, payload);
+        sentCount++;
       } catch (err: any) {
         if (err.statusCode === 410 || err.statusCode === 404) {
           await supabase.from('push_subscriptions').delete().eq('id', sub.id);
+        } else {
+          console.error("Cron Web Push Error:", err);
         }
       }
     });
 
     await Promise.all(promises);
 
-    return NextResponse.json({ success: true, sentTo: subs.length });
-  } catch (error) {
+    return NextResponse.json({ success: true, sentTo: sentCount });
+  } catch (error: any) {
     console.error('Cron push error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
