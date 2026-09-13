@@ -35,11 +35,20 @@ const approachTextColors: Record<Approach | string, string> = {
   simple: 'text-[#9c27b0]' 
 };
 
+interface CheckData {
+  answers?: { demands?: string[] };
+  selected_approach?: string;
+  suggested_approach?: string;
+}
+
 export default function Patterns() {
   const { dailyEntries, capacityChecks } = useAppStore();
 
   const entries = Object.values(dailyEntries).sort((a, b) => new Date(b.local_date).getTime() - new Date(a.local_date).getTime());
-  const checksList = Object.entries(capacityChecks).map(([date, data]) => ({ date, ...(data as Record<string, unknown>) })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const checksList = Object.entries(capacityChecks).map(([date, data]) => {
+    const check = data as CheckData;
+    return { date, ...check };
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
   const totalLogs = entries.length;
   const totalChecks = checksList.length;
