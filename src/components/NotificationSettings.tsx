@@ -23,7 +23,7 @@ export function NotificationSettings() {
   const checkSubscription = async () => {
     try {
       const registration = await navigator.serviceWorker.getRegistration();
-      if (registration) {
+      if (registration && registration.active) {
         const subscription = await registration.pushManager.getSubscription();
         setIsSubscribed(!!subscription);
       }
@@ -57,13 +57,11 @@ export function NotificationSettings() {
         throw new Error("This browser does not support notifications.");
       }
 
-      // 1. Explicitly request permission first (Required for iOS Web Push)
       const permission = await window.Notification.requestPermission();
       if (permission !== 'granted') {
         throw new Error("Notification permission denied. Please enable them in your device settings.");
       }
 
-      // 2. Ensure Service Worker is registered
       let registration = await navigator.serviceWorker.getRegistration();
       if (!registration) {
          registration = await navigator.serviceWorker.register('/sw.js');
@@ -73,7 +71,11 @@ export function NotificationSettings() {
          throw new Error("Could not register service worker. Try completely restarting the app.");
       }
 
-      // 3. Handle Subscription logic
+      // If the worker is installing/waiting but not active yet, wait for it
+      if (!registration.active) {
+        registration = await navigator.serviceWorker.ready;
+      }
+
       if (isSubscribed) {
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) await subscription.unsubscribe();
