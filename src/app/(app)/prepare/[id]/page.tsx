@@ -34,7 +34,7 @@ export default function PrepareBriefView() {
 
   const handleSaveToPlaybook = () => {
     const playbookItem = {
-      id: `pb-${Date.now()}`,
+      id: crypto.randomUUID(),
       type: 'preparation brief',
       source_id: brief.id,
       user_title: brief.user_title,

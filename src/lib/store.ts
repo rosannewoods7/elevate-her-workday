@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from './supabase';
 import { 
   Profile, 
   DailyPlan, 
@@ -15,6 +16,7 @@ import {
 import { suggestFocus, selectActions, RoutingContext } from './routing';
 
 export interface AppState {
+  hydrateFromCloud: (userId: string) => Promise<void>;
   profile: Profile | null;
   dailyPlans: Record<string, DailyPlan>; // keyed by local_date
   dailyEntries: Record<string, DailyEntry>; // keyed by local_date
@@ -70,6 +72,41 @@ const defaultProfile: Profile = {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      hydrateFromCloud: async (userId: string) => {
+        try {
+          const [
+            { data: profileData },
+            { data: planData },
+            { data: playbookData },
+            { data: briefData }
+          ] = await Promise.all([
+            supabase.from('profiles').select('full_profile').eq('account_id', userId).single(),
+            supabase.from('daily_plans').select('local_date, full_plan').eq('account_id', userId),
+            supabase.from('playbook_items').select('full_item').eq('account_id', userId),
+            supabase.from('preparation_briefs').select('full_brief').eq('account_id', userId)
+          ]);
+
+          set((state) => {
+            const newPlans = { ...state.dailyPlans };
+            planData?.forEach(p => { if (p.full_plan) newPlans[p.local_date] = p.full_plan; });
+            
+            const newPlaybook = { ...state.playbookItems };
+            playbookData?.forEach(p => { if (p.full_item) newPlaybook[p.full_item.id] = p.full_item; });
+            
+            const newBriefs = { ...state.preparationBriefs };
+            briefData?.forEach(b => { if (b.full_brief) newBriefs[b.full_brief.id] = b.full_brief; });
+
+            return {
+              profile: profileData?.full_profile || state.profile,
+              dailyPlans: newPlans,
+              playbookItems: newPlaybook,
+              preparationBriefs: newBriefs,
+            };
+          });
+        } catch (err) {
+          console.error("Hydration error:", err);
+        }
+      },
       profile: null,
       dailyPlans: {},
       dailyEntries: {},
@@ -144,7 +181,7 @@ export const useAppStore = create<AppState>()(
         const finalActions = actions.filter(a => !a.prior_tool || !excludeTools.includes(a.prior_tool));
         
         return {
-          id: `plan-${local_date}-${Date.now()}`,
+          id: crypto.randomUUID(),
           local_date,
           focus,
           actions: finalActions,
@@ -257,3 +294,67 @@ export const useAppStore = create<AppState>()(
     }
   )
 );
+
+
+// Optimistic Cloud Sync
+if (typeof window !== 'undefined') {
+  useAppStore.subscribe(async (state, prevState) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const uid = session?.user?.id;
+    if (!uid) return;
+
+    // Sync Profile
+    if (state.profile !== prevState.profile && state.profile) {
+      supabase.from('profiles').upsert({ account_id: uid, full_profile: state.profile }).then();
+    }
+    
+    // Sync Daily Plans
+    if (state.dailyPlans !== prevState.dailyPlans) {
+      for (const date in state.dailyPlans) {
+        if (state.dailyPlans[date] !== prevState.dailyPlans[date]) {
+          supabase.from('daily_plans').upsert({ 
+            account_id: uid, 
+            local_date: date, 
+            full_plan: state.dailyPlans[date] 
+          }, { onConflict: 'account_id,local_date' }).then();
+        }
+      }
+    }
+
+    // Sync Playbook Items
+    if (state.playbookItems !== prevState.playbookItems) {
+      for (const id in state.playbookItems) {
+        if (state.playbookItems[id] !== prevState.playbookItems[id]) {
+          const item = state.playbookItems[id];
+          supabase.from('playbook_items').upsert({
+            id: item.id,
+            account_id: uid,
+            type: item.type,
+            source_id: item.source_id,
+            user_title: item.user_title,
+            pinned: item.pinned,
+            saved_to_try: item.saved_to_try,
+            full_item: item
+          }).then();
+        }
+      }
+    }
+
+    // Sync Preparation Briefs
+    if (state.preparationBriefs !== prevState.preparationBriefs) {
+      for (const id in state.preparationBriefs) {
+        if (state.preparationBriefs[id] !== prevState.preparationBriefs[id]) {
+          const brief = state.preparationBriefs[id];
+          supabase.from('preparation_briefs').upsert({
+            id: brief.id,
+            account_id: uid,
+            scenario_id: brief.scenario_id,
+            user_title: brief.user_title,
+            state: brief.state,
+            full_brief: brief
+          }).then();
+        }
+      }
+    }
+  });
+}

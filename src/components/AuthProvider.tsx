@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, usePathname } from 'next/navigation';
+import { useAppStore } from '@/lib/store';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         const isAuthRoute = pathname === '/login' || pathname === '/register';
 
+        if (session?.user?.id) {
+          await useAppStore.getState().hydrateFromCloud(session.user.id);
+        }
         if (!session && !isAuthRoute) {
           router.push('/login');
         } else if (session && isAuthRoute) {
@@ -37,7 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user?.id) {
+        await useAppStore.getState().hydrateFromCloud(session.user.id);
+      }
       const isAuthRoute = pathname === '/login' || pathname === '/register';
       if (!session && !isAuthRoute) {
         router.push('/login');

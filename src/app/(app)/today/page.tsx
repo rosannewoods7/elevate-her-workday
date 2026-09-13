@@ -53,7 +53,7 @@ export default function Today() {
 
   const handleSaveStrategy = (action: any) => {
     savePlaybookItem({
-      id: `pb-${Date.now()}`,
+      id: crypto.randomUUID(),
       type: 'strategy',
       source_id: action.id,
       user_title: action.title,

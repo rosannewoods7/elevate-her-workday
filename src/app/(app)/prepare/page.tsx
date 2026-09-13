@@ -30,7 +30,7 @@ export default function PrepareBuilder() {
     }
     
     const newBrief = {
-      id: `brief-${Date.now()}`,
+      id: crypto.randomUUID(),
       scenario_id: template.id,
       user_title: `Preparing for: ${template.title}`,
       state: 'draft',
