@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Bell, BellOff, Loader2 } from 'lucide-react';
+import { Bell, BellOff, Loader2, Send } from 'lucide-react';
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
@@ -9,6 +9,7 @@ export function NotificationSettings() {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTesting, setIsTesting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -79,7 +80,6 @@ export function NotificationSettings() {
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) {
           await subscription.unsubscribe();
-          // Remove from DB
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user?.id) {
             await supabase.from('push_subscriptions').delete().eq('endpoint', subscription.endpoint);
@@ -99,7 +99,6 @@ export function NotificationSettings() {
 
         const subJson = subscription.toJSON();
         
-        // Insert directly using the client's authenticated Supabase session
         const { error: dbError } = await supabase.from('push_subscriptions').upsert({
           account_id: session.user.id,
           endpoint: subJson.endpoint,
@@ -119,6 +118,36 @@ export function NotificationSettings() {
     }
   };
 
+  const testPush = async () => {
+    setIsTesting(true);
+    setError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) throw new Error("Not logged in");
+
+      const res = await fetch('/api/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          account_id: session.user.id,
+          title: "It works!",
+          message: "Your phone is now successfully connected to Elevate HER Workday.",
+          url: "/today"
+        })
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error("Failed to send test push: " + txt);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Test push failed");
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
   if (!isSupported) return null;
 
   return (
@@ -134,13 +163,26 @@ export function NotificationSettings() {
           </p>
         </div>
         
-        <button
-          onClick={toggleSubscription}
-          disabled={isLoading}
-          className={"px-4 py-2 rounded font-bold text-sm transition-colors " + (isSubscribed ? "bg-[var(--eh-line)] text-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]" : "bg-[var(--eh-plum)] text-white hover:opacity-90")}
-        >
-          {isLoading ? <Loader2 size={16} className="animate-spin" /> : isSubscribed ? 'Disable' : 'Enable'}
-        </button>
+        <div className="flex items-center gap-2">
+          {isSubscribed && (
+            <button
+              onClick={testPush}
+              disabled={isTesting}
+              className="p-2 rounded font-bold text-sm transition-colors text-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]"
+              title="Send Test Push"
+            >
+              {isTesting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            </button>
+          )}
+
+          <button
+            onClick={toggleSubscription}
+            disabled={isLoading}
+            className={"px-4 py-2 rounded font-bold text-sm transition-colors " + (isSubscribed ? "bg-[var(--eh-line)] text-[var(--eh-plum)] hover:bg-[var(--eh-canvas)]" : "bg-[var(--eh-plum)] text-white hover:opacity-90")}
+          >
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : isSubscribed ? 'Disable' : 'Enable'}
+          </button>
+        </div>
       </div>
       {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
     </div>
